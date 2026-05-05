@@ -1900,6 +1900,10 @@ flowchart LR
                     <p id="modalDescription"></p>
                 </div>
                 <div class="modal-section">
+                    <div class="modal-section-title">Inputs Required</div>
+                    <ul class="output-list" id="modalInputs"></ul>
+                </div>
+                <div class="modal-section">
                     <div class="modal-section-title">Agents Involved</div>
                     <div id="modalAgents"></div>
                 </div>
@@ -1952,6 +1956,23 @@ flowchart LR
                 num: '00', colorClass: 'step-1', title: 'Project Initialization',
                 description: 'Khởi tạo nền tảng cho dự án VietPay: brainstorm định vị sản phẩm trong thị trường ví điện tử Việt Nam, draft SRS với SBV compliance, wireframe các flow chính (onboarding, eKYC, P2P transfer, VietQR scan), sau đó hoàn thiện design system trên Figma.',
                 agents: ['Brainstorm Agent', 'Docs Manager Agent', 'Design Tools (Figma)'],
+                inputs: [
+                    {
+                        type: 'user', name: 'Customer vision / project brief',
+                        desc: 'Founder/PO mô tả ý tưởng VietPay: ví điện tử + P2P + VietQR cho thị trường VN, target Gen Z + Millennials.',
+                        tags: [{ label: 'Human-provided', cls: '' }, { label: 'Required', cls: 'priority' }]
+                    },
+                    {
+                        type: 'user', name: 'Market & regulatory context',
+                        desc: 'Thông tin thị trường VN fintech (MoMo, ZaloPay…), SBV regulations, KYC/AML constraints. Có thể parse từ docs/web research.',
+                        tags: [{ label: 'Research input', cls: '' }, { label: 'Optional', cls: '' }]
+                    },
+                    {
+                        type: 'design', name: 'Brand assets (logo, colors)',
+                        desc: 'Brand identity ban đầu — logo, brand color (#00B074 VietPay green), typography preference. Nếu chưa có, Design Tools sẽ đề xuất.',
+                        tags: [{ label: 'Optional', cls: '' }]
+                    }
+                ],
                 outputs: [
                     {
                         type: 'doc', name: 'docs/idea-brainstorm.md',
@@ -2013,6 +2034,36 @@ flowchart LR
                 num: '01', colorClass: 'step-2', title: 'Planning + Human Gate',
                 description: 'Planner Agent phân tích MVP, spawn 3 Researcher song song (Sepay payment, VNPT eKYC, SBV compliance), tổng hợp thành plan 8 phase / 12 tuần với critical path: KYC → Auth → Bank linking → Transfer engine. **Human Gate**: Tech Lead + PM review plan kỹ — validate scope alignment, architectural soundness, effort estimates, risk register. Approve mới được unlock Step 03 TDD; reject → loop back để Planner revise.',
                 agents: ['Planner Agent', 'Researcher Agent (Sepay)', 'Researcher Agent (eKYC)', 'Researcher Agent (SBV)', '👤 Human Tech Lead', '👤 Human PM'],
+                inputs: [
+                    {
+                        type: 'doc', name: 'docs/srs.md',
+                        path: 'docs/srs.md',
+                        desc: 'Software Requirements Specification từ Step 00 — 12 FR + 8 NFR + SBV/AML/KYC/PCI-DSS constraints.',
+                        tags: [{ label: 'From Step 00', cls: '' }, { label: 'Required', cls: 'priority' }]
+                    },
+                    {
+                        type: 'design', name: 'docs/wireframes/*.md',
+                        desc: 'Wireframes các flow chính (onboarding, P2P transfer, VietQR scan) — Planner dùng để estimate UI effort.',
+                        tags: [{ label: 'From Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/design-system.md',
+                        path: 'docs/design-system.md',
+                        desc: 'Design tokens (colors, typography, spacing) — input cho phase UI components.',
+                        tags: [{ label: 'From Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/competitive-analysis.md',
+                        path: 'docs/competitive-analysis.md',
+                        desc: 'Competitive landscape — Researcher dùng để benchmark feature scope + tech stack choices.',
+                        tags: [{ label: 'From Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'user', name: 'Tech stack constraints',
+                        desc: 'Hard constraints từ team: React Native (mobile), NestJS (backend), PostgreSQL, AWS region ap-southeast-1.',
+                        tags: [{ label: 'Human-provided', cls: '' }]
+                    }
+                ],
                 outputs: [
                     {
                         type: 'doc', name: 'plans/260505-1100-vietpay-mvp/plan.md',
@@ -2093,6 +2144,31 @@ flowchart LR
             '2': {
                 num: '02', colorClass: 'step-3', title: 'TDD · Superpowers',
                 description: 'Theo framework <b>obra/superpowers</b> — chu kỳ TDD 6 bước: (1) 🔴 <b>RED</b> viết test fail tối thiểu, (2) ✅ <b>Verify RED</b> kiểm tra test fail vì đúng lý do (decision gate), (3) 🟢 <b>GREEN</b> code tối thiểu để pass, (4) ✅ <b>Verify GREEN</b> full suite xanh + không regression (decision gate), (5) 🔵 <b>REFACTOR</b> clean trong khi vẫn giữ xanh, (6) loop sang behavior kế tiếp. Rule cứng: <i>"NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"</i> — bất kỳ code nào viết trước test đều phải xóa và viết lại theo TDD. Source: <code>skills/test-driven-development/SKILL.md</code>.',
+                inputs: [
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/plan.md',
+                        path: 'plans/260505-1100-vietpay-mvp/plan.md',
+                        desc: 'Master plan đã được Human Gate approve — định hướng 8 phase / 12 tuần, critical path, dependencies.',
+                        tags: [{ label: 'From Step 01', cls: '' }, { label: 'Approved', cls: 'success' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-XX.md',
+                        desc: 'Phase file cụ thể đang implement (vd. phase-04-p2p-transfer-engine.md) — chứa requirements, related files, implementation steps, success criteria.',
+                        tags: [{ label: 'From Step 01', cls: '' }, { label: 'Per phase', cls: '' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/plan-review-checklist-260605.md',
+                        path: 'plans/reports/plan-review-checklist-260605.md',
+                        desc: 'Sign-off từ Human Gate — bắt buộc phải APPROVED mới unlock TDD step.',
+                        tags: [{ label: 'Gate', cls: 'priority' }, { label: 'Required', cls: 'priority' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/system-architecture.md',
+                        path: 'docs/system-architecture.md',
+                        desc: 'Architecture reference: service topology, event bus, DB ownership — TDD implementer dùng để align with target design.',
+                        tags: [{ label: 'From Step 01', cls: '' }]
+                    }
+                ],
                 agents: ['Tester Agent (RED)', 'Developer Agent (GREEN)', 'Refactor pass'],
                 outputs: [
                     {
@@ -2172,6 +2248,30 @@ flowchart LR
             '3': {
                 num: '03', colorClass: 'step-4', title: 'Code Review',
                 description: 'Reviewer Agent audit chất lượng code, OWASP Top 10 + STRIDE security, performance bottleneck. Phát hiện 14 findings (3 high) — major: race condition trong transfer-service, SQL injection risk trong query history, missing TLS 1.2 enforcement giữa internal services.',
+                inputs: [
+                    {
+                        type: 'code', name: 'Implementation source code',
+                        desc: 'Tất cả code từ Step 02 TDD (47 commits qua 8 phases) — services + tests + migrations + IaC.',
+                        tags: [{ label: 'From Step 02', cls: '' }, { label: '~124k LOC', cls: '' }]
+                    },
+                    {
+                        type: 'test', name: 'plans/reports/tester-260605-mvp-test-results.md',
+                        path: 'plans/reports/tester-260605-mvp-test-results.md',
+                        desc: 'Test results 218/220 pass, coverage 96.2% lines — Reviewer dùng để focus audit vào uncovered code paths.',
+                        tags: [{ label: 'From Step 02', cls: '' }, { label: '96% cov', cls: 'success' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/system-architecture.md',
+                        path: 'docs/system-architecture.md',
+                        desc: 'Architecture reference — Reviewer verify code có align với design (service boundary, event flow).',
+                        tags: [{ label: 'From Step 01', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'OWASP Top 10 + STRIDE checklist',
+                        desc: 'Security audit framework chuẩn — automated agent scans for known vulnerability patterns.',
+                        tags: [{ label: 'Built-in', cls: '' }]
+                    }
+                ],
                 agents: ['Code Reviewer Agent', 'Security Audit Agent'],
                 outputs: [
                     {
@@ -2197,6 +2297,44 @@ flowchart LR
             '4': {
                 num: '04', colorClass: 'step-5', title: '👤 Human Final Review',
                 description: 'Human Reviewer (Tech Lead + Product Owner) đánh giá tổng thể toàn bộ AI artifacts từ Step 00–04 trước khi cho phép deploy. Đây là production-readiness gate cuối cùng — verify business fit, validate quality, đánh giá production risk. Reject → loop back tới phase liên quan để revise; Approve → unlock Step 06 Delivery.',
+                inputs: [
+                    {
+                        type: 'review', name: 'plans/reports/code-review-260605-vietpay-mvp.md',
+                        path: 'plans/reports/code-review-260605-vietpay-mvp.md',
+                        desc: 'Code review findings — 14 findings, 3 HIGH closed.',
+                        tags: [{ label: 'From Step 03', cls: '' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/security-audit-260605.md',
+                        path: 'plans/reports/security-audit-260605.md',
+                        desc: 'Security audit — OWASP Top-10 clean, AML/KYC pass, PCI-DSS Level 1 prep.',
+                        tags: [{ label: 'From Step 03', cls: '' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/performance-260605.md',
+                        path: 'plans/reports/performance-260605.md',
+                        desc: 'Performance audit — all p95 SLAs met (transfer 720ms, balance 12ms).',
+                        tags: [{ label: 'From Step 03', cls: '' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/qa-acceptance-test.md',
+                        path: 'plans/reports/qa-acceptance-test.md',
+                        desc: 'QA acceptance — 69/70 test cases pass (1 out of scope).',
+                        tags: [{ label: 'From Step 03', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/reports/business-fit-validation.md',
+                        path: 'plans/reports/business-fit-validation.md',
+                        desc: 'PRD alignment + user testing NPS 58 — business fit validated.',
+                        tags: [{ label: 'From Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/production-risk-assessment.md',
+                        path: 'plans/reports/production-risk-assessment.md',
+                        desc: 'Production risk register — 3 MED, 2 LOW, all mitigated với monitoring + auto-scale.',
+                        tags: [{ label: 'Aggregated', cls: '' }]
+                    }
+                ],
                 agents: ['Human Tech Lead', 'Human Product Owner', 'Human QA Lead'],
                 outputs: [
                     {
@@ -2236,6 +2374,36 @@ flowchart LR
             '5': {
                 num: '05', colorClass: 'step-6', title: 'Delivery & Deploy',
                 description: 'Auto-commit conventional cho 47 commits, tạo PR #142 với summary + test plan + screenshots, deploy tới ECS (Singapore + Frankfurt regions), publish iOS TestFlight + Play Store internal track, sync changelog + roadmap.',
+                inputs: [
+                    {
+                        type: 'review', name: 'plans/reports/human-final-review-260605.md',
+                        path: 'plans/reports/human-final-review-260605.md',
+                        desc: 'Sign-off cuối cùng từ Tech Lead + PO + QA Lead — bắt buộc để unlock deploy.',
+                        tags: [{ label: 'From Step 04', cls: '' }, { label: 'APPROVED', cls: 'success' }, { label: 'Required', cls: 'priority' }]
+                    },
+                    {
+                        type: 'code', name: 'Approved code base + tests',
+                        desc: 'Code đã pass review, security, performance — ready to ship.',
+                        tags: [{ label: 'From Step 02-03', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/reports/rollback-plan.md',
+                        path: 'plans/reports/rollback-plan.md',
+                        desc: 'Rollback plan — triggers, steps, decision authority. SRE on-call cần đọc trước cutover.',
+                        tags: [{ label: 'From Step 04', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/reports/go-no-go-meeting-minutes.md',
+                        path: 'plans/reports/go-no-go-meeting-minutes.md',
+                        desc: 'Go/No-Go meeting minutes — confirmed launch window 22:00 ICT 2026-06-05.',
+                        tags: [{ label: 'From Step 04', cls: '' }]
+                    },
+                    {
+                        type: 'user', name: 'Deploy credentials & secrets',
+                        desc: 'AWS IAM (ECS, RDS), App Store Connect API key, Play Store service account, Sentry/Datadog tokens — provided via secret manager.',
+                        tags: [{ label: 'Infra', cls: '' }, { label: 'Required', cls: 'priority' }]
+                    }
+                ],
                 agents: ['Git Manager Agent', 'DevOps Agent', 'Docs Manager Agent'],
                 outputs: [
                     {
@@ -2274,6 +2442,28 @@ flowchart LR
                 num: '00', colorClass: 'step-7', title: '📚 Document Standardization',
                 description: 'Brownfield-specific entry step: chuẩn hoá tất cả tài liệu để pipeline đi tiếp giống hệt greenfield. AI parse customer-provided docs (requirements briefs, contracts), Reverse Engineer Agent extract architecture-as-is từ codebase V1, Gap Analyzer so sánh as-is vs to-be. Output là bộ docs chuẩn hoá (SRS · architecture · wireframe · gap analysis) — đồng bộ format với greenfield Step 00 để Step 01 Planning xử lý nhất quán.',
                 agents: ['Doc Parser Agent', 'Repomix Agent', 'Reverse Engineer Agent', 'Gap Analyzer Agent', 'Change Impact Mapper'],
+                inputs: [
+                    {
+                        type: 'user', name: 'customer-input/v2-requirements-brief.docx',
+                        desc: 'Brief từ khách hàng (PO của VietPay V1): "V2 cần add bill payment EVN/Internet/Mobile + top-up. 50k tx/day. Q3 launch."',
+                        tags: [{ label: 'Customer doc', cls: '' }, { label: 'Required', cls: 'priority' }]
+                    },
+                    {
+                        type: 'code', name: 'Legacy codebase V1 (full repo)',
+                        desc: 'Source code monorepo VietPay V1 — Repomix Agent pack thành single context, Reverse Engineer extract architecture.',
+                        tags: [{ label: 'Brownfield input', cls: '' }, { label: '~124k LOC', cls: '' }]
+                    },
+                    {
+                        type: 'user', name: 'V1 maintainer interviews',
+                        desc: 'Tribal knowledge từ team V1 — bottlenecks, pain points, hidden contracts. Optional nhưng improve gap analysis quality.',
+                        tags: [{ label: 'Optional', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'Existing V1 docs (if any)',
+                        desc: 'Bất kỳ docs có sẵn (architecture, runbook, postmortems) — Doc Parser ingest để supplement reverse-engineering.',
+                        tags: [{ label: 'Optional', cls: '' }]
+                    }
+                ],
                 outputs: [
                     {
                         type: 'user', name: 'customer-input/v2-requirements-brief.docx',
@@ -2327,6 +2517,38 @@ flowchart LR
                 num: '01', colorClass: 'step-2', title: 'Planning + Human Gate',
                 description: 'Strategist Agent đề xuất migration strategy. Cho V1 wallet/transfer shared-DB → strangler fig (dual-write 2 tuần, sau đó cutover). Risk register tập trung regression hot spots. **Human Gate**: Tech Lead + PM + Customer SME approve strategy trước khi đụng code.',
                 agents: ['Migration Strategist', 'Risk Analyzer', 'Test Coverage Planner', '👤 Human Tech Lead', '👤 Human Customer SME'],
+                inputs: [
+                    {
+                        type: 'doc', name: 'docs/srs-v2.md',
+                        path: 'docs/srs-v2.md',
+                        desc: 'SRS V2 chuẩn hoá từ customer brief — 8 FR mới + 5 NFR + SBV constraints.',
+                        tags: [{ label: 'From Brownfield Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/architecture-as-is.md',
+                        path: 'docs/architecture-as-is.md',
+                        desc: 'Architecture-as-is: 6 services, shared DB anti-pattern, integration map. Strategist dùng để chọn migration approach.',
+                        tags: [{ label: 'From Brownfield Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/gap-analysis.md',
+                        path: 'docs/gap-analysis.md',
+                        desc: '12 gaps: 4 new modules, 3 extensions, 2 migrations — input cho phase planning.',
+                        tags: [{ label: 'From Brownfield Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/change-impact-map.md',
+                        path: 'docs/change-impact-map.md',
+                        desc: 'Module/endpoint/DB tables affected — Risk Analyzer dùng để identify regression hot spots.',
+                        tags: [{ label: 'From Brownfield Step 00', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/tech-debt-inventory.md',
+                        path: 'docs/tech-debt-inventory.md',
+                        desc: 'Tech debt: 14 god classes, 0% test cov on 4 modules — Test Coverage Planner ưu tiên characterization tests.',
+                        tags: [{ label: 'From Brownfield Step 00', cls: '' }, { label: 'Risk input', cls: 'warn' }]
+                    }
+                ],
                 outputs: [
                     {
                         type: 'doc', name: 'plans/260505-1100-vietpay-v2/migration-plan.md',
@@ -2397,6 +2619,7 @@ flowchart LR
         const modalTitle = document.getElementById('modalTitle');
         const modalDescription = document.getElementById('modalDescription');
         const modalAgents = document.getElementById('modalAgents');
+        const modalInputs = document.getElementById('modalInputs');
         const modalOutputs = document.getElementById('modalOutputs');
         const modalClose = document.getElementById('modalClose');
 
@@ -2413,7 +2636,7 @@ flowchart LR
             modalAgents.innerHTML = data.agents
                 .map(a => `<span class="agent-tag">▸ ${a}</span>`).join('');
 
-            modalOutputs.innerHTML = data.outputs.map(o => {
+            const renderItem = o => {
                 const tagsHtml = (o.tags || []).map(t =>
                     `<span class="output-tag ${t.cls || ''}">${escapeHtml(t.label)}</span>`
                 ).join('');
@@ -2431,9 +2654,16 @@ flowchart LR
                         ${viewBtn}
                     </div>
                 </li>`;
-            }).join('');
+            };
 
-            modalOutputs.querySelectorAll('.output-view-btn').forEach(btn => {
+            const inputs = data.inputs || [];
+            modalInputs.innerHTML = inputs.length
+                ? inputs.map(renderItem).join('')
+                : '<li class="output-item" style="opacity:0.6;"><div class="output-content"><div class="output-desc">No prerequisite inputs — entry step.</div></div></li>';
+
+            modalOutputs.innerHTML = data.outputs.map(renderItem).join('');
+
+            modal.querySelectorAll('.output-view-btn').forEach(btn => {
                 btn.addEventListener('click', () => openDoc(btn.dataset.docPath));
             });
 
