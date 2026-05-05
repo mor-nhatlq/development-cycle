@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<!-- saved from url=(0100)https://gist.githack.com/mor-nhatlq/2fc2362761dbc3ba1a5f2cc995d959cf/raw/ai-agent-workflow-demo.html -->
+<html lang="vi"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Driven Software Development Lifecycle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/atom-one-dark.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/common.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0A0E1A;
+            --bg-card: #0F1629;
+            --bg-elevated: #151D33;
+            --border: rgba(56, 189, 248, 0.12);
+            --border-hover: rgba(56, 189, 248, 0.3);
+            --text-primary: #E2E8F0;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent-blue: #38BDF8;
+            --accent-cyan: #22D3EE;
+            --accent-green: #34D399;
+            --accent-purple: #A78BFA;
+            --accent-amber: #FBBF24;
+            --accent-red: #F87171;
+            --accent-teal: #2DD4BF;
+            --accent-pink: #F472B6;
+            --glow-blue: rgba(56, 189, 248, 0.15);
+            --glow-cyan: rgba(34, 211, 238, 0.1);
+            --glow-pink: rgba(244, 114, 182, 0.15);
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 24px;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top glow accent */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(56, 189, 248, 0.08), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .header-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--accent-cyan);
+            background: rgba(34, 211, 238, 0.08);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 20px;
+            padding: 6px 16px;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-tag .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        h1 {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        h1 .highlight {
+            color: var(--accent-blue);
+            text-shadow: 0 0 30px var(--glow-blue);
+        }
+
+        .subtitle {
+            font-family: var(--font-sans);
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        /* Foundation Setup Section */
+        .foundation-section {
+            width: 100%;
+            margin-bottom: 32px;
+            background: linear-gradient(180deg, rgba(56,189,248,0.04), rgba(56,189,248,0.01));
+            border: 1px solid rgba(56,189,248,0.18);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+        }
+        .foundation-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 24px; right: 24px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+        }
+        .foundation-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .foundation-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(56,189,248,0.12);
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .foundation-title {
+            font-family: var(--font-mono);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 4px;
+            letter-spacing: -0.01em;
+        }
+        .foundation-subtitle {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+        .foundation-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+        .foundation-row-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            position: relative;
+        }
+        .foundation-row-split::before {
+            content: '↔';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 50%;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 1100px) {
+            .foundation-row-split { grid-template-columns: 1fr; }
+            .foundation-row-split::before { display: none; }
+        }
+        .foundation-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .foundation-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            opacity: 0.85;
+        }
+        .foundation-card.card-tools::before { background: var(--accent-blue); }
+        .foundation-card.card-risks::before { background: var(--accent-red); }
+        .foundation-card.card-mitigation::before { background: var(--accent-green); }
+
+        .foundation-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .foundation-card-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .foundation-card.card-tools .foundation-card-num { background: rgba(56,189,248,0.15); color: var(--accent-blue); border: 1px solid rgba(56,189,248,0.3); }
+        .foundation-card.card-risks .foundation-card-num { background: rgba(248,113,113,0.15); color: var(--accent-red); border: 1px solid rgba(248,113,113,0.3); }
+        .foundation-card.card-mitigation .foundation-card-num { background: rgba(52,211,153,0.15); color: var(--accent-green); border: 1px solid rgba(52,211,153,0.3); }
+
+        .foundation-card-title {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .foundation-card-body {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .foundation-card-body p { margin: 0 0 10px; }
+        .foundation-card-body strong { color: var(--text-primary); }
+
+        /* Compact comparison table */
+        .foundation-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .foundation-table th, .foundation-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: left;
+        }
+        .foundation-table th {
+            background: rgba(255,255,255,0.04);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .foundation-table td:first-child {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            color: var(--text-muted);
+        }
+        .foundation-table tr:last-child td { border-bottom: 0; }
+        .foundation-table .pick {
+            color: #6ee7b7;
+            font-weight: 600;
+        }
+        .foundation-table .meh { color: #fcd34d; }
+        .foundation-table .bad { color: #fca5a5; }
+
+        .foundation-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+        .foundation-list li {
+            padding: 8px 0 8px 22px;
+            position: relative;
+            font-size: 0.84rem;
+            line-height: 1.55;
+            border-bottom: 1px dashed rgba(255,255,255,0.06);
+        }
+        .foundation-list li:last-child { border-bottom: 0; }
+        .foundation-list li::before {
+            position: absolute;
+            left: 0;
+            top: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .foundation-list.list-risks li::before { content: '⚠'; color: var(--accent-red); }
+        .foundation-list.list-mitigations li::before { content: '✓'; color: var(--accent-green); }
+        .foundation-list .item-title {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .foundation-verdict {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(52,211,153,0.08);
+            border: 1px solid rgba(52,211,153,0.25);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #d1fae5;
+        }
+        .foundation-verdict strong { color: #6ee7b7; }
+
+        /* Diagram container */
+        .diagram-container {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 32px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagram-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            opacity: 0.5;
+        }
+
+        /* Terminal title bar */
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red { background: #FF5F57; }
+        .terminal-dot.yellow { background: #FEBC2E; }
+        .terminal-dot.green { background: #28C840; }
+
+        .terminal-title {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-left: 12px;
+            letter-spacing: 0.03em;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 28px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.01em;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+        .dot-pink { background: var(--accent-pink); box-shadow: 0 0 6px rgba(244, 114, 182, 0.4); }
+        .dot-blue { background: var(--accent-blue); box-shadow: 0 0 6px rgba(56, 189, 248, 0.4); }
+        .dot-cyan { background: var(--accent-cyan); box-shadow: 0 0 6px rgba(34, 211, 238, 0.4); }
+        .dot-purple { background: var(--accent-purple); box-shadow: 0 0 6px rgba(167, 139, 250, 0.4); }
+        .dot-green { background: var(--accent-green); box-shadow: 0 0 6px rgba(52, 211, 153, 0.4); }
+        .dot-amber { background: var(--accent-amber); box-shadow: 0 0 6px rgba(251, 191, 36, 0.4); }
+        .dot-red { background: var(--accent-red); box-shadow: 0 0 6px rgba(248, 113, 113, 0.4); }
+        .dot-teal { background: var(--accent-teal); box-shadow: 0 0 6px rgba(45, 212, 191, 0.4); }
+
+        /* Detail cards */
+        .details {
+            width: 100%;
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .details { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .details { grid-template-columns: 1fr; }
+            h1 { font-size: 1.6rem; }
+            .diagram-container { padding: 24px 16px 20px; }
+        }
+
+        .detail-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-cta {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(255,255,255,0.08);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+            transition: color 0.2s ease;
+        }
+
+        .detail-card:hover .card-cta { color: var(--accent-cyan); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 26, 0.78);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hover);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 720px;
+            max-height: 86vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(56, 189, 248, 0.1);
+            transform: translateY(8px) scale(0.98);
+            transition: transform 0.2s ease;
+        }
+        .modal-overlay.active .modal { transform: translateY(0) scale(1); }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            padding: 24px 28px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 1;
+        }
+
+        .modal-header h2 {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+            flex: 1;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease;
+            font-family: var(--font-mono);
+        }
+        .modal-close:hover { background: rgba(248, 113, 113, 0.12); color: var(--accent-red); }
+
+        .modal-body { padding: 20px 28px 28px; }
+
+        .project-banner {
+            background: linear-gradient(135deg, rgba(0,176,116,0.08), rgba(56,189,248,0.06));
+            border: 1px solid rgba(0,176,116,0.25);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .project-banner::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: #00B074;
+        }
+        .project-banner-tag {
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            font-weight: 600;
+            color: #34d399;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+        .project-banner-name {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .project-banner-sub {
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+        .project-banner-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .output-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .output-tag {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            padding: 2px 7px;
+            letter-spacing: 0.02em;
+        }
+        .output-tag.priority { color: #fcd34d; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+        .output-tag.success { color: #6ee7b7; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
+        .output-tag.warn { color: #fca5a5; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+
+        .output-preview {
+            margin-top: 8px;
+            background: #0a0e1a;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .output-preview .pk { color: #a5b4fc; }
+        .output-preview .pv { color: #6ee7b7; }
+        .output-preview .pc { color: var(--text-muted); font-style: italic; }
+
+        .output-view-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: rgba(56,189,248,0.1);
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 6px;
+            color: var(--accent-cyan);
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            text-decoration: none;
+        }
+        .output-view-btn:hover { background: rgba(56,189,248,0.18); }
+
+        /* Doc viewer */
+        /* ---- Doc Viewer (reader-friendly) ---- */
+
+        /* Modal expands wider when viewing doc */
+        .modal-overlay.viewing-doc .modal {
+            max-width: 1280px;
+            max-height: 92vh;
+        }
+
+        .doc-viewer {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            inset: 0;
+            background: var(--bg-card);
+            border-radius: 16px;
+            z-index: 2;
+        }
+        .doc-viewer.active { display: flex; }
+
+        /* Reading progress bar */
+        .doc-viewer-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            transition: width 0.1s linear;
+            z-index: 3;
+        }
+
+        .doc-viewer-header {
+            position: relative;
+            background: var(--bg-card);
+            padding: 16px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+        .doc-viewer-back {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: background 0.18s, color 0.18s;
+        }
+        .doc-viewer-back:hover { background: rgba(56,189,248,0.1); color: var(--accent-cyan); }
+        .doc-viewer-path {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .doc-viewer-toggle-toc {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            display: none; /* shown only on smaller screens */
+        }
+        .doc-viewer-toggle-toc:hover { background: rgba(255,255,255,0.08); }
+
+        /* Body — TOC sidebar + main content side-by-side */
+        .doc-viewer-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* TOC sidebar */
+        .doc-viewer-toc {
+            width: 240px;
+            flex-shrink: 0;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            overflow-y: auto;
+            padding: 24px 16px 24px 24px;
+            background: rgba(0,0,0,0.15);
+        }
+        .doc-viewer-toc-title {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .doc-viewer-toc ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .doc-viewer-toc li {
+            margin: 0;
+            padding: 0;
+        }
+        .doc-viewer-toc a {
+            display: block;
+            padding: 6px 10px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.45;
+            border-radius: 6px;
+            border-left: 2px solid transparent;
+            text-decoration: none;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            margin: 2px 0;
+        }
+        .doc-viewer-toc a:hover {
+            background: rgba(56,189,248,0.06);
+            color: var(--text-primary);
+        }
+        .doc-viewer-toc a.active {
+            background: rgba(56,189,248,0.1);
+            color: var(--accent-cyan);
+            border-left-color: var(--accent-cyan);
+            font-weight: 500;
+        }
+        .doc-viewer-toc .toc-h3 { padding-left: 22px; font-size: 0.78rem; }
+        .doc-viewer-toc .toc-h4 { padding-left: 34px; font-size: 0.74rem; }
+        .doc-viewer-toc-empty {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-style: italic;
+            padding: 8px 0;
+        }
+
+        /* Main scrollable area */
+        .doc-viewer-main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 32px 48px 64px;
+            min-width: 0;
+        }
+        /* Constrain prose width for optimal reading */
+        .doc-viewer-content {
+            max-width: 760px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            font-size: 0.98rem;
+            font-family: var(--font-sans);
+        }
+
+        /* Typography hierarchy */
+        .doc-viewer-content h1 {
+            font-family: var(--font-mono);
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.25;
+            letter-spacing: -0.015em;
+            scroll-margin-top: 20px;
+        }
+        .doc-viewer-content h2 {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin: 38px 0 14px;
+            padding-top: 4px;
+            line-height: 1.3;
+            scroll-margin-top: 20px;
+        }
+        .doc-viewer-content h3 {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 28px 0 12px;
+            line-height: 1.35;
+            scroll-margin-top: 20px;
+        }
+        .doc-viewer-content h4 {
+            font-family: var(--font-mono);
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 20px 0 10px;
+            scroll-margin-top: 20px;
+        }
+        .doc-viewer-content h1 + p,
+        .doc-viewer-content h2 + p,
+        .doc-viewer-content h3 + p { margin-top: 4px; }
+
+        .doc-viewer-content p { margin: 0 0 14px; }
+        .doc-viewer-content ul, .doc-viewer-content ol {
+            margin: 4px 0 18px;
+            padding-left: 26px;
+        }
+        .doc-viewer-content li {
+            margin-bottom: 6px;
+            padding-left: 4px;
+        }
+        .doc-viewer-content li > p { margin-bottom: 6px; }
+
+        .doc-viewer-content strong { color: var(--text-primary); font-weight: 600; }
+        .doc-viewer-content em { color: var(--accent-purple); font-style: italic; }
+        .doc-viewer-content a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(56,189,248,0.4);
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .doc-viewer-content a:hover {
+            border-bottom-style: solid;
+            background: rgba(56,189,248,0.08);
+        }
+
+        /* Inline code */
+        .doc-viewer-content code {
+            font-family: var(--font-mono);
+            font-size: 0.86em;
+            background: rgba(56,189,248,0.1);
+            color: #7dd3fc;
+            padding: 2px 7px;
+            border-radius: 5px;
+            border: 1px solid rgba(56,189,248,0.18);
+        }
+
+        /* Code blocks with header + copy button */
+        .doc-viewer-content pre {
+            position: relative;
+            background: #0a0e1a;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .doc-viewer-content pre::before {
+            content: attr(data-lang);
+            display: block;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 6px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .doc-viewer-content pre[data-lang=""]::before,
+        .doc-viewer-content pre:not([data-lang])::before { display: none; }
+        .doc-viewer-content pre code {
+            display: block;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 14px 18px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            border: 0;
+            white-space: pre;
+        }
+        .doc-viewer-copy-btn {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(56,189,248,0.1);
+            border: 1px solid rgba(56,189,248,0.25);
+            color: var(--accent-cyan);
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.15s, background 0.15s;
+        }
+        .doc-viewer-content pre:hover .doc-viewer-copy-btn { opacity: 1; }
+        .doc-viewer-copy-btn:hover { background: rgba(56,189,248,0.2); }
+        .doc-viewer-copy-btn.copied {
+            background: rgba(52,211,153,0.15);
+            border-color: rgba(52,211,153,0.3);
+            color: #6ee7b7;
+            opacity: 1;
+        }
+
+        .doc-viewer-content blockquote {
+            border-left: 4px solid var(--accent-purple);
+            padding: 8px 0 8px 18px;
+            margin: 16px 0;
+            color: var(--text-muted);
+            background: rgba(167,139,250,0.04);
+            border-radius: 0 6px 6px 0;
+        }
+        .doc-viewer-content blockquote p { margin: 0; font-style: italic; }
+
+        /* Tables — wrapped in scrollable container by JS */
+        .doc-viewer-table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            background: #0a0e1a;
+        }
+        .doc-viewer-content table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.88rem;
+            margin: 0;
+        }
+        .doc-viewer-content th, .doc-viewer-content td {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 10px 14px;
+            text-align: left;
+        }
+        .doc-viewer-content th {
+            background: rgba(56,189,248,0.08);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .doc-viewer-content td { color: var(--text-secondary); }
+        .doc-viewer-content tr:hover td { background: rgba(56,189,248,0.04); }
+        .doc-viewer-content tr:last-child td { border-bottom: 0; }
+
+        .doc-viewer-content hr {
+            border: 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 36px 0;
+        }
+        .doc-viewer-content img { max-width: 100%; border-radius: 8px; }
+
+        /* Mermaid diagrams in docs */
+        .doc-viewer-content .mermaid {
+            background: #0a0e1a;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 18px 0;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+        .doc-viewer-content .mermaid svg { max-width: 100%; height: auto; }
+
+        /* Responsive: collapse TOC on smaller screens */
+        @media (max-width: 900px) {
+            .modal-overlay.viewing-doc .modal { max-width: 100%; max-height: 100vh; border-radius: 0; }
+            .doc-viewer-toc {
+                position: absolute;
+                top: 60px; left: 0; bottom: 0;
+                z-index: 2;
+                background: var(--bg-card);
+                width: 280px;
+                transform: translateX(-100%);
+                transition: transform 0.25s;
+            }
+            .doc-viewer-toc.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.4); }
+            .doc-viewer-toggle-toc { display: inline-flex; }
+            .doc-viewer-main { padding: 24px 20px 48px; }
+        }
+
+        .doc-viewer-error {
+            padding: 28px;
+            max-width: 760px;
+            margin: 0 auto;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+        .doc-viewer-error code {
+            display: inline-block;
+            background: rgba(56,189,248,0.08);
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: 4px;
+            padding: 2px 8px;
+            color: #7dd3fc;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+        .doc-viewer-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            gap: 10px;
+        }
+        .doc-viewer-loading::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(56,189,248,0.2);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .modal-section { margin-bottom: 22px; }
+        .modal-section:last-child { margin-bottom: 0; }
+
+        .modal-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .modal-section p {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .output-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+        .output-item {
+            background: var(--bg-elevated);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            transition: border-color 0.2s ease;
+        }
+        .output-item:hover { border-color: var(--border-hover); }
+
+        .output-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .output-icon.doc  { background: rgba(129,140,248,0.12); color: #a5b4fc; border: 1px solid rgba(129,140,248,0.25); }
+        .output-icon.code { background: rgba(52,211,153,0.12); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+        .output-icon.test { background: rgba(251,191,36,0.12); color: #fcd34d; border: 1px solid rgba(251,191,36,0.25); }
+        .output-icon.design { background: rgba(244,114,182,0.12); color: #f9a8d4; border: 1px solid rgba(244,114,182,0.25); }
+        .output-icon.deploy { background: rgba(45,212,191,0.12); color: #5eead4; border: 1px solid rgba(45,212,191,0.25); }
+        .output-icon.review { background: rgba(248,113,113,0.12); color: #fca5a5; border: 1px solid rgba(248,113,113,0.25); }
+        .output-icon.user { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.25); }
+
+        .output-content { flex: 1; min-width: 0; }
+        .output-name {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 2px;
+            word-break: break-all;
+        }
+        .output-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .agent-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent-purple);
+            background: rgba(167,139,250,0.1);
+            border: 1px solid rgba(167,139,250,0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            border-radius: 12px 12px 0 0;
+            opacity: 0.7;
+        }
+
+        .detail-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 24px rgba(56, 189, 248, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .details-greenfield .detail-card:nth-child(1)::before { background: var(--accent-pink); }
+        .details-greenfield .detail-card:nth-child(2)::before { background: var(--accent-purple); }
+        .details-greenfield .detail-card:nth-child(3)::before { background: var(--accent-green); }
+        .details-greenfield .detail-card:nth-child(4)::before { background: var(--accent-red); }
+        .details-greenfield .detail-card:nth-child(5)::before { background: var(--accent-amber); }
+        .details-greenfield .detail-card:nth-child(6)::before { background: var(--accent-teal); }
+
+        .details-brownfield .detail-card:nth-child(1)::before { background: var(--accent-cyan); }
+        .details-brownfield .detail-card:nth-child(2)::before { background: var(--accent-purple); }
+        .details-brownfield .detail-card:nth-child(3)::before { background: var(--accent-green); }
+        .details-brownfield .detail-card:nth-child(4)::before { background: var(--accent-red); }
+        .details-brownfield .detail-card:nth-child(5)::before { background: var(--accent-amber); }
+        .details-brownfield .detail-card:nth-child(6)::before { background: var(--accent-teal); }
+
+        /* Pipeline tabs */
+        .pipeline-tabs {
+            display: inline-flex;
+            gap: 4px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        .pipeline-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: 0;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 500;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease;
+        }
+        .pipeline-tab:hover { color: var(--text-primary); }
+        .pipeline-tab.active {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+        }
+        .pipeline-tab .tab-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .mermaid.hidden, .details.hidden { display: none !important; }
+        .legend.hidden { display: none !important; }
+
+        .pipeline-section { width: 100%; }
+        .pipeline-section.hidden { display: none; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .step-0 { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+        .step-1 { background: rgba(244, 114, 182, 0.15); color: var(--accent-pink); border: 1px solid rgba(244, 114, 182, 0.3); }
+        .step-2 { background: rgba(167, 139, 250, 0.15); color: var(--accent-purple); border: 1px solid rgba(167, 139, 250, 0.3); }
+        .step-3 { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.3); }
+        .step-4 { background: rgba(248, 113, 113, 0.15); color: var(--accent-red); border: 1px solid rgba(248, 113, 113, 0.3); }
+        .step-5 { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .step-6 { background: rgba(45, 212, 191, 0.15); color: var(--accent-teal); border: 1px solid rgba(45, 212, 191, 0.3); }
+        .step-7 { background: rgba(34, 211, 238, 0.15); color: var(--accent-cyan); border: 1px solid rgba(34, 211, 238, 0.3); }
+
+        .card-header h3 {
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .detail-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-card li {
+            padding: 5px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            display: flex;
+            gap: 8px;
+        }
+
+        .detail-card li::before {
+            content: ">";
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 48px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+
+        .footer-line {
+            width: 40px;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .header-tag .dot { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-tag">
+                <span class="dot"></span>
+                AI-Powered Development Pipeline
+            </div>
+            <h1>AI<span class="highlight">_</span>Driven Software<br>Development Lifecycle</h1>
+            <p class="subtitle">End-to-end software delivery powered by autonomous AI Agents — from requirements analysis to production deployment.</p>
+        </div>
+
+        <section class="foundation-section">
+            <div class="foundation-header">
+                <span class="foundation-badge"><span style="color:var(--accent-green)">●</span> Foundation</span>
+                <div>
+                    <h2 class="foundation-title">AI Tool &amp; Agent Setup</h2>
+                    <p class="foundation-subtitle">One-time foundation setup applies to all pipelines (Greenfield + Brownfield). Phải hoàn tất trước khi bắt đầu bất kỳ project nào — pick AI tools, build custom agents, harden security.</p>
+                </div>
+            </div>
+
+            <div class="foundation-grid">
+                <!-- Card 1: Tool Selection -->
+                <div class="foundation-card card-tools">
+                    <div class="foundation-card-header">
+                        <span class="foundation-card-num">01</span>
+                        <h3 class="foundation-card-title">Why Claude Code? Tool Selection</h3>
+                    </div>
+                    <div class="foundation-card-body">
+                        <p>So sánh 3 AI coding tools chính, focus vào <strong>security posture</strong> + <strong>agent infrastructure</strong>:</p>
+                        <table class="foundation-table">
+                            <thead>
+                                <tr><th>Aspect</th><th>Claude Code</th><th>Codex</th><th>Anti-Gravity</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Context window</td><td class="pick">1M (Opus 4.7)</td><td>200k</td><td class="pick">1M+</td></tr>
+                                <tr><td>Code reasoning</td><td class="pick">Best-in-class</td><td>Strong</td><td>Good</td></tr>
+                                <tr><td>Permission model</td><td class="pick">Granular allowlist + hooks</td><td class="meh">Coarse</td><td>Granular</td></tr>
+                                <tr><td>Pre/Post tool hooks</td><td class="pick">Native (security gate)</td><td class="bad">None</td><td class="meh">Limited</td></tr>
+                                <tr><td>MCP server support</td><td class="pick">First-class</td><td class="meh">Limited</td><td class="pick">Native</td></tr>
+                                <tr><td>Audit trail</td><td class="pick">Immutable transcripts</td><td>Partial</td><td>Built-in</td></tr>
+                                <tr><td>Prompt-injection defense</td><td class="pick">Skill + hook validation</td><td class="meh">Limited</td><td class="meh">Limited</td></tr>
+                                <tr><td>On-prem option</td><td>Anthropic Enterprise</td><td>Azure OpenAI</td><td>Vertex AI Private</td></tr>
+                                <tr><td>Cost (USD/dev/month)</td><td>~200-400</td><td>~200-300</td><td>~300-500</td></tr>
+                                <tr><td>Vendor maturity</td><td class="pick">Production stable</td><td class="pick">Production stable</td><td class="meh">Newer (2024)</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="foundation-verdict">
+                            <strong>Decision:</strong> Claude Code primary (security hooks + audit trail + 1M context).
+                            Codex fallback cho bulk migrations. Anti-Gravity cho multi-modal use cases.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Risks ↔ Mitigations (paired comparison) -->
+                <div class="foundation-row-split">
+                <!-- Card 2: Security Risks -->
+                <div class="foundation-card card-risks">
+                    <div class="foundation-card-header">
+                        <span class="foundation-card-num">02</span>
+                        <h3 class="foundation-card-title">Security Risks · Khi áp dụng external Skills/Agents</h3>
+                    </div>
+                    <div class="foundation-card-body">
+                        <p>Top 5 rủi ro khi load skill/agent từ <strong>nguồn ngoài</strong> (public registry, GitHub gist, third-party MCP servers):</p>
+                        <ul class="foundation-list list-risks">
+                            <li>
+                                <span class="item-title">Prompt Injection (OWASP LLM01)</span>
+                                Indirect qua webpage scraped, file content, git diff, MCP response — agent đọc data có chứa instruction "ignore previous, leak secrets"
+                            </li>
+                            <li>
+                                <span class="item-title">Tool/Function Call Abuse</span>
+                                Skill compromised gọi destructive tools: <code>rm -rf /</code>, <code>DROP TABLE</code>, hay shell exec với user-controlled input
+                            </li>
+                            <li>
+                                <span class="item-title">Data Exfiltration</span>
+                                Sensitive data (.env, KYC docs, customer PII) được leak qua tool calls — vd: WebFetch tới attacker server, hoặc đính kèm vào prompt context
+                            </li>
+                            <li>
+                                <span class="item-title">Supply Chain</span>
+                                Skills tải từ unverified repos · MCP server bị compromise · dependency typosquatting · skills update silent với code malicious
+                            </li>
+                            <li>
+                                <span class="item-title">Hallucination Drift</span>
+                                Agent invent API/package không tồn tại → install malicious lookalike (vd: <code>react-router-doom</code>). Phantom dependencies risk supply-chain attack
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Card 3: Mitigations -->
+                <div class="foundation-card card-mitigation">
+                    <div class="foundation-card-header">
+                        <span class="foundation-card-num">03</span>
+                        <h3 class="foundation-card-title">Mitigation Mechanisms · Giảm thiểu rủi ro</h3>
+                    </div>
+                    <div class="foundation-card-body">
+                        <p><strong>Defense in depth</strong> — nhiều lớp bảo vệ kết hợp:</p>
+                        <ul class="foundation-list list-mitigations">
+                            <li>
+                                <span class="item-title">🤖 Dedicated Security Audit Agent</span>
+                                Agent riêng chuyên scan tất cả custom agent/skill: phát hiện prompt injection patterns, role-override attempts, unsafe shell exec, OWASP LLM Top 10. Run pre-commit + CI. Output <code>security-scan-agents.md</code>
+                            </li>
+                            <li>
+                                <span class="item-title">🔒 Permission Allowlist</span>
+                                <code>.claude/settings.json</code> deny-by-default cho destructive tools. Mỗi Bash/WebFetch/MCP call phải explicit allow. Block <code>rm -rf</code>, <code>DROP</code>, raw shell.
+                            </li>
+                            <li>
+                                <span class="item-title">⚙ Pre-Tool Hooks</span>
+                                Hook validate input trước khi tool execute: sanitize prompts, detect injection patterns, scan secrets. Reject nếu match suspicious patterns.
+                            </li>
+                            <li>
+                                <span class="item-title">📦 Sandbox Mode</span>
+                                Risky tools (file write, web fetch, exec) chạy trong isolated sandbox với egress whitelist + filesystem chroot. Network locked tới trusted domains.
+                            </li>
+                            <li>
+                                <span class="item-title">📜 Source Trust + Hash Pinning</span>
+                                Skills chỉ từ verified GitHub orgs (allowlist). Pin SHA hash, không auto-update. New skill require Tech Lead + Security review trước khi merge.
+                            </li>
+                            <li>
+                                <span class="item-title">📊 Monitoring + Audit</span>
+                                Transcript logging immutable (S3 Object Lock 7y). Anomaly detection cho unusual tool patterns. Daily auto-review. Quarterly external pen test.
+                            </li>
+                        </ul>
+                        <div class="foundation-verdict">
+                            <strong>Key innovation:</strong> Security Audit Agent là agent đầu tiên build (trước mọi agent khác) — dùng để scan chính các agent kế tiếp. Self-bootstrapping security: <em>"AI guards AI"</em>.
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="pipeline-tabs" role="tablist">
+            <button class="pipeline-tab active" data-pipeline="greenfield" role="tab" aria-selected="true">
+                <span class="tab-icon">🌱</span> Greenfield
+            </button>
+            <button class="pipeline-tab" data-pipeline="brownfield" role="tab" aria-selected="false">
+                <span class="tab-icon">🏗</span> Brownfield
+            </button>
+        </div>
+
+        <div class="diagram-container">
+            <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+                <span class="terminal-title" id="terminalTitle">workflow.pipeline — greenfield · ai-agent-orchestration</span>
+            </div>
+
+            <div class="mermaid pipeline-greenfield">
+flowchart LR
+    USER[User / Product Owner<br>Define Initial Idea]
+
+    subgraph PHASE0["STEP 0 · Project Initialization"]
+        direction TB
+        BRAINSTORM[Brainstorm Agent<br>Generate Ideas]
+        DOCS_INIT[Docs Manager Agent<br>SRS / Wireframe / Mockup]
+        DESIGN_TOOL[Figma / GG Stitch<br>Refined Design]
+        BRAINSTORM --> DOCS_INIT --> DESIGN_TOOL
+    end
+
+    subgraph PHASE1["STEP 1 · Planning + Human Gate"]
+        direction TB
+        PLANNER[Planner Agent<br>Analyze & Plan]
+        RESEARCHER[Researcher Agents<br>Parallel Research]
+        DOCS[Plan + Architecture<br>+ Specs]
+        HGATE{{"👤 HUMAN GATE<br>Review &amp; Approve Plan"}}
+        PLANNER --> RESEARCHER --> DOCS --> HGATE
+        HGATE -.->|Reject · revise| PLANNER
+    end
+
+    subgraph PHASE2["STEP 2 · TDD · Superpowers"]
+        direction TB
+        RED["🔴 RED<br>Write Minimal Failing Test"]
+        VRED{{"Verify RED<br>fails for correct reason?"}}
+        GREEN["🟢 GREEN<br>Minimal Code to Pass"]
+        VGREEN{{"Verify GREEN<br>all tests pass · no regression?"}}
+        REFACTOR["🔵 REFACTOR<br>Clean while green"]
+        RED --> VRED
+        VRED -->|yes| GREEN
+        VRED -.->|no · rewrite test| RED
+        GREEN --> VGREEN
+        VGREEN -->|yes| REFACTOR
+        VGREEN -.->|no · fix code| GREEN
+        REFACTOR -.->|Next feature| RED
+    end
+
+    subgraph PHASE3["STEP 3 · Code Review"]
+        direction TB
+        REVIEWER[Reviewer Agent<br>Quality & Security]
+        REPORT[Review Report<br>Findings]
+        REVIEWER --> REPORT
+    end
+
+    subgraph PHASE4["STEP 4 · Human Final Review"]
+        direction TB
+        HREVIEW["👤 Human Reviewer<br>Audit All AI Artifacts"]
+        HCHECKLIST{{"Production-Ready?<br>Quality · Business Fit · Risk"}}
+        HSIGNOFF["✅ Sign-off<br>Approve to Deliver"]
+        HREVIEW --> HCHECKLIST
+        HCHECKLIST -->|approve| HSIGNOFF
+        HCHECKLIST -.->|reject| HREVIEW
+    end
+
+    subgraph PHASE5["STEP 5 · Delivery"]
+        direction TB
+        COMMIT[Git Commit & Push]
+        PR[Pull Request]
+        DEPLOY[Deploy to Production]
+        COMMIT --> PR --> DEPLOY
+    end
+
+    USER --> PHASE0 --> PHASE1 --> PHASE2 --> PHASE3 --> PHASE4 --> PHASE5
+    PHASE3 -.->|Fix findings| PHASE2
+    PHASE4 -.->|Block · revise relevant phase| PHASE2
+    PHASE5 -.->|Sync Docs| PHASE1
+
+    classDef userClass fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe,stroke-width:2px
+    classDef initClass fill:#831843,stroke:#f472b6,color:#fce7f3,stroke-width:2px
+    classDef planClass fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:2px
+    classDef docClass fill:#312e81,stroke:#818cf8,color:#e0e7ff,stroke-width:2px
+    classDef codeClass fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:2px
+    classDef testClass fill:#78350f,stroke:#fbbf24,color:#fef3c7,stroke-width:2px
+    classDef reviewClass fill:#7f1d1d,stroke:#f87171,color:#fee2e2,stroke-width:2px
+    classDef humanClass fill:#713f12,stroke:#fbbf24,color:#fef3c7,stroke-width:2px
+    classDef deployClass fill:#134e4a,stroke:#2dd4bf,color:#ccfbf1,stroke-width:2px
+
+    class USER userClass
+    class BRAINSTORM,DOCS_INIT,DESIGN_TOOL initClass
+    class PLANNER planClass
+    class RESEARCHER,DOCS docClass
+    class HGATE,HREVIEW,HCHECKLIST,HSIGNOFF humanClass
+    class GREEN,REFACTOR codeClass
+    class RED testClass
+    class REVIEWER,REPORT reviewClass
+    class COMMIT,PR,DEPLOY deployClass
+            </div>
+
+            <div class="mermaid pipeline-brownfield hidden">
+flowchart LR
+    INPUT["Customer Input<br>Source Code + Docs"]
+
+    subgraph BF0["STEP 0 · Document Standardization"]
+        direction TB
+        BF_PARSE["Doc Parser Agent<br>Read Customer Docs"]
+        BF_REVERSE["Reverse Engineer<br>Codebase → Architecture"]
+        BF_GAP["Gap Analyzer<br>As-Is vs To-Be"]
+        BF_STD["Standardized Docs<br>SRS · Wireframe · Architecture"]
+        BF_PARSE --> BF_REVERSE --> BF_GAP --> BF_STD
+    end
+
+    subgraph BF1["STEP 1 · Planning + Human Gate"]
+        direction TB
+        BF_PLANNER[Planner Agent<br>Migration Strategy]
+        BF_RESEARCH[Researcher Agents<br>Parallel Research]
+        BF_PLAN_OUT[Plan + Risk Register<br>+ Phased Tasks]
+        BF_HGATE{{"👤 HUMAN GATE<br>Tech Lead + PM + Customer SME"}}
+        BF_PLANNER --> BF_RESEARCH --> BF_PLAN_OUT --> BF_HGATE
+        BF_HGATE -.->|Reject · revise| BF_PLANNER
+    end
+
+    subgraph BF2["STEP 2 · TDD · Superpowers"]
+        direction TB
+        BF_RED["🔴 RED<br>Write Minimal Failing Test"]
+        BF_VRED{{"Verify RED<br>fails for correct reason?"}}
+        BF_GREEN["🟢 GREEN<br>Minimal Code to Pass"]
+        BF_VGREEN{{"Verify GREEN<br>all tests pass · no regression?"}}
+        BF_REFACTOR["🔵 REFACTOR<br>Clean while green"]
+        BF_RED --> BF_VRED
+        BF_VRED -->|yes| BF_GREEN
+        BF_VRED -.->|no · rewrite test| BF_RED
+        BF_GREEN --> BF_VGREEN
+        BF_VGREEN -->|yes| BF_REFACTOR
+        BF_VGREEN -.->|no · fix code| BF_GREEN
+        BF_REFACTOR -.->|Next feature| BF_RED
+    end
+
+    subgraph BF3["STEP 3 · Code Review"]
+        direction TB
+        BF_REVIEWER[Reviewer Agent<br>Quality &amp; Security]
+        BF_REPORT[Review Report<br>Findings]
+        BF_REVIEWER --> BF_REPORT
+    end
+
+    subgraph BF4["STEP 4 · Human Final Review"]
+        direction TB
+        BF_HREVIEW["👤 Human Reviewer<br>Audit All AI Artifacts"]
+        BF_HCHECKLIST{{"Production-Ready?<br>Quality · Business Fit · Risk"}}
+        BF_HSIGNOFF["✅ Sign-off<br>Approve to Deliver"]
+        BF_HREVIEW --> BF_HCHECKLIST
+        BF_HCHECKLIST -->|approve| BF_HSIGNOFF
+        BF_HCHECKLIST -.->|reject| BF_HREVIEW
+    end
+
+    subgraph BF5["STEP 5 · Delivery"]
+        direction TB
+        BF_COMMIT[Git Commit & Push]
+        BF_PR[Pull Request]
+        BF_DEPLOY[Deploy to Production]
+        BF_COMMIT --> BF_PR --> BF_DEPLOY
+    end
+
+    INPUT --> BF0 --> BF1 --> BF2 --> BF3 --> BF4 --> BF5
+    BF3 -.->|Fix findings| BF2
+    BF4 -.->|Block · revise relevant phase| BF2
+    BF5 -.->|Sync Docs| BF1
+
+    classDef inputClass fill:#0c4a6e,stroke:#38bdf8,color:#e0f2fe,stroke-width:2px
+    classDef bfStdDoc fill:#083344,stroke:#22d3ee,color:#cffafe,stroke-width:2px
+    classDef bfPlan fill:#2e1065,stroke:#a78bfa,color:#ede9fe,stroke-width:2px
+    classDef bfDoc fill:#312e81,stroke:#818cf8,color:#e0e7ff,stroke-width:2px
+    classDef bfCode fill:#064e3b,stroke:#34d399,color:#d1fae5,stroke-width:2px
+    classDef bfTest fill:#78350f,stroke:#fbbf24,color:#fef3c7,stroke-width:2px
+    classDef bfReview fill:#7f1d1d,stroke:#f87171,color:#fee2e2,stroke-width:2px
+    classDef bfHuman fill:#713f12,stroke:#fbbf24,color:#fef3c7,stroke-width:2px
+    classDef bfDeploy fill:#134e4a,stroke:#2dd4bf,color:#ccfbf1,stroke-width:2px
+
+    class INPUT inputClass
+    class BF_PARSE,BF_REVERSE,BF_GAP,BF_STD bfStdDoc
+    class BF_PLANNER bfPlan
+    class BF_RESEARCH,BF_PLAN_OUT bfDoc
+    class BF_HGATE,BF_HREVIEW,BF_HCHECKLIST,BF_HSIGNOFF,BF_VRED,BF_VGREEN bfHuman
+    class BF_GREEN,BF_REFACTOR bfCode
+    class BF_RED bfTest
+    class BF_REVIEWER,BF_REPORT bfReview
+    class BF_COMMIT,BF_PR,BF_DEPLOY bfDeploy
+            </div>
+
+            <div class="legend pipeline-greenfield">
+                <div class="legend-item"><div class="legend-dot dot-pink"></div>Project Initialization</div>
+                <div class="legend-item"><div class="legend-dot dot-purple"></div>Planning &amp; Docs</div>
+                <div class="legend-item"><div class="legend-dot dot-green"></div>TDD Implementation (Code)</div>
+                <div class="legend-item"><div class="legend-dot dot-red"></div>Code Review</div>
+                <div class="legend-item"><div class="legend-dot dot-amber"></div>👤 Human Review &amp; Gates</div>
+                <div class="legend-item"><div class="legend-dot dot-teal"></div>Delivery</div>
+            </div>
+
+            <div class="legend pipeline-brownfield hidden">
+                <div class="legend-item"><div class="legend-dot dot-cyan"></div>Document Standardization</div>
+                <div class="legend-item"><div class="legend-dot dot-purple"></div>Planning &amp; Docs</div>
+                <div class="legend-item"><div class="legend-dot dot-green"></div>TDD (Char. Tests + Cycle)</div>
+                <div class="legend-item"><div class="legend-dot dot-red"></div>Code Review + Regression</div>
+                <div class="legend-item"><div class="legend-dot dot-amber"></div>👤 Human Review &amp; Gates</div>
+                <div class="legend-item"><div class="legend-dot dot-teal"></div>Cautious Delivery</div>
+            </div>
+        </div>
+
+        <div class="details details-greenfield pipeline-greenfield">
+            <div class="detail-card" data-step="0">
+                <div class="card-header">
+                    <span class="step-num step-1">00</span>
+                    <h3>Project Initialization</h3>
+                </div>
+                <ul>
+                    <li>Brainstorm Agent discusses &amp; generates ideas</li>
+                    <li>Docs Manager drafts SRS, wireframes, mockups</li>
+                    <li>Figma / GG Stitch / Claude Design refines product design</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="1">
+                <div class="card-header">
+                    <span class="step-num step-2">01</span>
+                    <h3>Planning + Human Gate</h3>
+                </div>
+                <ul>
+                    <li>Planner Agent creates implementation plan</li>
+                    <li>Researcher Agents run parallel technical research</li>
+                    <li>Auto-generates architecture, phases, specs</li>
+                    <li>👤 <b>Human Gate</b> — review plan, validate scope &amp; tradeoffs</li>
+                    <li>Approve hoặc reject (loop back để revise)</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="2">
+                <div class="card-header">
+                    <span class="step-num step-3">02</span>
+                    <h3>TDD · Superpowers</h3>
+                </div>
+                <ul>
+                    <li>🔴 <b>RED</b> — viết test fail tối thiểu cho 1 behavior</li>
+                    <li>✅ <b>Verify RED</b> — test phải fail vì đúng lý do (gate)</li>
+                    <li>🟢 <b>GREEN</b> — code tối thiểu vừa đủ để pass</li>
+                    <li>✅ <b>Verify GREEN</b> — full suite xanh, không regression (gate)</li>
+                    <li>🔵 <b>REFACTOR</b> — clean code khi vẫn giữ xanh</li>
+                    <li>⛔ <i>NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST</i></li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="3">
+                <div class="card-header">
+                    <span class="step-num step-4">03</span>
+                    <h3>Code Review</h3>
+                </div>
+                <ul>
+                    <li>Reviewer Agent audits quality &amp; security</li>
+                    <li>Detects edge cases, performance issues</li>
+                    <li>Issues found → back to TDD loop</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="4">
+                <div class="card-header">
+                    <span class="step-num step-5">04</span>
+                    <h3>👤 Human Final Review</h3>
+                </div>
+                <ul>
+                    <li>Human audit toàn bộ AI artifacts (code · tests · docs · review reports)</li>
+                    <li>Validate quality + business fit + production risk</li>
+                    <li>Sign-off checklist gate trước khi deploy</li>
+                    <li>Reject → loop back tới phase liên quan để revise</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="5">
+                <div class="card-header">
+                    <span class="step-num step-6">05</span>
+                    <h3>Delivery &amp; Deploy</h3>
+                </div>
+                <ul>
+                    <li>Auto-commit with conventional messages</li>
+                    <li>Creates PR with summary &amp; test plan</li>
+                    <li>Deploy &amp; sync documentation updates</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+        </div>
+
+        <div class="details details-brownfield pipeline-brownfield hidden">
+            <div class="detail-card" data-step="0" data-pipeline="brownfield">
+                <div class="card-header">
+                    <span class="step-num step-7">00</span>
+                    <h3>📚 Document Standardization</h3>
+                </div>
+                <ul>
+                    <li>Doc Parser Agent đọc &amp; parse customer-provided docs</li>
+                    <li>Reverse Engineer Agent extract architecture-as-is từ codebase</li>
+                    <li>Gap Analyzer compare as-is vs to-be → impact map</li>
+                    <li>Output bộ docs chuẩn (SRS · wireframe · architecture) — đồng bộ format greenfield</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="1" data-pipeline="brownfield">
+                <div class="card-header">
+                    <span class="step-num step-2">01</span>
+                    <h3>Planning + Human Gate</h3>
+                </div>
+                <ul>
+                    <li>Planner Agent đề xuất migration strategy (Strangler Fig / Incremental / Big Bang)</li>
+                    <li>Researcher Agents song song · risk register · phased tasks</li>
+                    <li>👤 <b>Human Gate</b> — Tech Lead + PM + <b>Customer SME</b> approve plan</li>
+                    <li>Reject → loop back để revise</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="2" data-pipeline="brownfield">
+                <div class="card-header">
+                    <span class="step-num step-3">02</span>
+                    <h3>TDD · Superpowers</h3>
+                </div>
+                <ul>
+                    <li>🔴 <b>RED</b> — viết test fail tối thiểu cho 1 behavior</li>
+                    <li>✅ <b>Verify RED</b> — test phải fail vì đúng lý do (gate)</li>
+                    <li>🟢 <b>GREEN</b> — code tối thiểu vừa đủ để pass</li>
+                    <li>✅ <b>Verify GREEN</b> — full suite xanh, không regression (gate)</li>
+                    <li>🔵 <b>REFACTOR</b> — clean code khi vẫn giữ xanh</li>
+                    <li>⛔ <i>NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST</i></li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="3" data-pipeline="brownfield">
+                <div class="card-header">
+                    <span class="step-num step-4">03</span>
+                    <h3>Code Review</h3>
+                </div>
+                <ul>
+                    <li>Reviewer Agent audits quality &amp; security</li>
+                    <li>Detects edge cases, performance issues</li>
+                    <li>Issues found → back to TDD loop</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="4" data-pipeline="brownfield">
+                <div class="card-header">
+                    <span class="step-num step-5">04</span>
+                    <h3>👤 Human Final Review</h3>
+                </div>
+                <ul>
+                    <li>Human audit toàn bộ AI artifacts (code · tests · docs · review reports)</li>
+                    <li>Validate quality + business fit + production risk</li>
+                    <li>Sign-off checklist gate trước khi deploy</li>
+                    <li>Reject → loop back tới phase liên quan để revise</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+            <div class="detail-card" data-step="5" data-pipeline="brownfield">
+                <div class="card-header">
+                    <span class="step-num step-6">05</span>
+                    <h3>Delivery &amp; Deploy</h3>
+                </div>
+                <ul>
+                    <li>Auto-commit with conventional messages</li>
+                    <li>Creates PR with summary &amp; test plan</li>
+                    <li>Deploy &amp; sync documentation updates</li>
+                </ul>
+                <div class="card-cta">View outputs →</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="footer-line"></span>
+            Powered by Claude Code — AI Agent Orchestration
+            <span class="footer-line"></span>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="stepModal" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal">
+            <div class="doc-viewer" id="docViewer">
+                <div class="doc-viewer-progress" id="docViewerProgress"></div>
+                <div class="doc-viewer-header">
+                    <button class="doc-viewer-back" id="docViewerBack">← Back</button>
+                    <button class="doc-viewer-toggle-toc" id="docViewerToggleToc" aria-label="Toggle TOC">☰ TOC</button>
+                    <span class="doc-viewer-path" id="docViewerPath"></span>
+                </div>
+                <div class="doc-viewer-body">
+                    <aside class="doc-viewer-toc" id="docViewerToc">
+                        <div class="doc-viewer-toc-title">On this page</div>
+                        <ul id="docViewerTocList"></ul>
+                    </aside>
+                    <div class="doc-viewer-main" id="docViewerMain">
+                        <article class="doc-viewer-content" id="docViewerContent"></article>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-header">
+                <span class="step-num" id="modalStepNum">00</span>
+                <h2 id="modalTitle">Step Title</h2>
+                <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="project-banner">
+                    <div class="project-banner-tag">Project Context</div>
+                    <div class="project-banner-name">VietPay <span class="project-banner-sub">— Digital Wallet &amp; P2P Transfer App</span></div>
+                    <div class="project-banner-desc">Vietnamese fintech wallet · P2P transfer + VietQR payment · React Native + NestJS · Sepay / VNPT eKYC · SBV compliance</div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">What Happens in This Step</div>
+                    <p id="modalDescription"></p>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">Agents Involved</div>
+                    <div id="modalAgents"></div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-section-title">Outputs / Deliverables</div>
+                    <ul class="output-list" id="modalOutputs"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            themeVariables: {
+                darkMode: true,
+                background: '#0F1629',
+                primaryColor: '#0c4a6e',
+                primaryTextColor: '#e0f2fe',
+                primaryBorderColor: '#38bdf8',
+                lineColor: '#475569',
+                secondaryColor: '#2e1065',
+                tertiaryColor: '#0F1629',
+                fontSize: '13px',
+                fontFamily: "'JetBrains Mono', 'Fira Code', monospace"
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 16,
+                nodeSpacing: 30,
+                rankSpacing: 45
+            }
+        });
+
+        // Render only the active pipeline at startup; brownfield is rendered lazily on tab switch.
+        document.addEventListener('DOMContentLoaded', () => {
+            const initial = document.querySelector('.mermaid.pipeline-greenfield');
+            if (initial && window.mermaid) {
+                try { mermaid.run({ nodes: [initial] }); initial.dataset.processed = '1'; } catch (e) { console.error(e); }
+            }
+        });
+    </script>
+
+    <script>
+        const STEP_DATA = {
+            '0': {
+                num: '00', colorClass: 'step-1', title: 'Project Initialization',
+                description: 'Khởi tạo nền tảng cho dự án VietPay: brainstorm định vị sản phẩm trong thị trường ví điện tử Việt Nam, draft SRS với SBV compliance, wireframe các flow chính (onboarding, eKYC, P2P transfer, VietQR scan), sau đó hoàn thiện design system trên Figma.',
+                agents: ['Brainstorm Agent', 'Docs Manager Agent', 'Design Tools (Figma)'],
+                outputs: [
+                    {
+                        type: 'doc', name: 'docs/idea-brainstorm.md',
+                        path: 'docs/idea-brainstorm.md',
+                        desc: 'Định vị sản phẩm vs MoMo / ZaloPay / ViettelPay. Target: Gen Z + Millennials VN. USP: clean UX + AI auto-categorize + social split bills.',
+                        tags: [{ label: 'Discovery', cls: '' }, { label: '~1.2k LOC', cls: '' }],
+                        preview: '<span class="pk">target_users</span>: <span class="pv">"Gen Z + Millennials, 18-35, urban VN"</span>\n<span class="pk">pain_points</span>:\n  - <span class="pv">"Split bills khó với bạn bè"</span>\n  - <span class="pv">"App ngân hàng UX phức tạp"</span>\n  - <span class="pv">"Không có wallet thống nhất"</span>\n<span class="pk">competitors</span>: <span class="pv">[MoMo, ZaloPay, ShopeePay, ViettelPay]</span>\n<span class="pk">differentiator</span>: <span class="pv">"Social-first + AI insights"</span>'
+                    },
+                    {
+                        type: 'doc', name: 'docs/competitive-analysis.md',
+                        path: 'docs/competitive-analysis.md',
+                        desc: 'Feature matrix vs 4 competitors chính + market positioning map.',
+                        tags: [{ label: 'Research', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/srs.md',
+                        path: 'docs/srs.md',
+                        desc: 'Software Requirements Specification — 12 FR + 8 NFR + SBV/AML/KYC/PCI-DSS constraints.',
+                        tags: [{ label: '12 FR', cls: '' }, { label: '8 NFR', cls: '' }, { label: 'SBV compliant', cls: 'success' }],
+                        preview: '<span class="pc"># FR-005: P2P Transfer</span>\nUser send VND tới recipient qua phone / QR / bank.\n<span class="pk">- Limit:</span> <span class="pv">10M VND/giao dịch · 100M/ngày</span>\n<span class="pk">- Latency:</span> <span class="pv">&lt; 3s end-to-end</span>\n<span class="pk">- Idempotency:</span> <span class="pv">required (Idempotency-Key header)</span>\n\n<span class="pc"># NFR-002: Availability</span>\n<span class="pk">- SLA:</span> <span class="pv">99.9% uptime (43.8 min downtime/month)</span>'
+                    },
+                    {
+                        type: 'design', name: 'docs/wireframes/onboarding-flow.md',
+                        path: 'docs/wireframes/onboarding-flow.md',
+                        desc: '7-screen onboarding: phone → OTP → eKYC (CMND/CCCD scan + selfie) → link bank → set PIN → biometric → dashboard.',
+                        tags: [{ label: 'Wireframe', cls: '' }, { label: '7 screens', cls: '' }]
+                    },
+                    {
+                        type: 'design', name: 'docs/wireframes/p2p-transfer-flow.md',
+                        path: 'docs/wireframes/p2p-transfer-flow.md',
+                        desc: 'Flow chuyển tiền: pick recipient → amount + note → review → biometric confirm → success animation + receipt.',
+                        tags: [{ label: 'Wireframe', cls: '' }, { label: '6 screens', cls: '' }]
+                    },
+                    {
+                        type: 'design', name: 'docs/wireframes/vietqr-scan-flow.md',
+                        path: 'docs/wireframes/vietqr-scan-flow.md',
+                        desc: 'Flow quét VietQR: camera → parse QR → confirm merchant + amount → biometric → success.',
+                        tags: [{ label: 'Wireframe', cls: '' }, { label: '5 screens', cls: '' }]
+                    },
+                    {
+                        type: 'design', name: 'docs/mockups/home-dashboard.fig',
+                        desc: 'Hi-fi mockup home: balance card · quick actions · recent transactions · spending insights.',
+                        tags: [{ label: 'Hi-fi', cls: '' }, { label: 'Light + Dark', cls: '' }]
+                    },
+                    {
+                        type: 'design', name: 'design/figma-link.md',
+                        desc: 'Figma project: 42 screens · 24 components · auto-layout · variants cho mọi state (default/hover/pressed/disabled/loading).',
+                        tags: [{ label: '42 screens', cls: '' }, { label: '24 components', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/design-system.md',
+                        desc: 'Design tokens: VietPay brand color, typography Inter + SF Pro, 4px spacing grid, radius scale, elevation tokens.',
+                        tags: [{ label: 'Tokens', cls: '' }],
+                        preview: '<span class="pc">// brand colors</span>\n<span class="pk">--brand-primary</span>: <span class="pv">#00B074</span>  <span class="pc">// VietPay green</span>\n<span class="pk">--brand-secondary</span>: <span class="pv">#0EA5E9</span>\n<span class="pk">--success</span>: <span class="pv">#16A34A</span>\n<span class="pk">--warning</span>: <span class="pv">#F59E0B</span>\n<span class="pk">--danger</span>: <span class="pv">#DC2626</span>\n\n<span class="pc">// typography</span>\n<span class="pk">--font-display</span>: <span class="pv">"SF Pro Display"</span>\n<span class="pk">--font-body</span>: <span class="pv">"Inter"</span>'
+                    }
+                ]
+            },
+            '1': {
+                num: '01', colorClass: 'step-2', title: 'Planning + Human Gate',
+                description: 'Planner Agent phân tích MVP, spawn 3 Researcher song song (Sepay payment, VNPT eKYC, SBV compliance), tổng hợp thành plan 8 phase / 12 tuần với critical path: KYC → Auth → Bank linking → Transfer engine. **Human Gate**: Tech Lead + PM review plan kỹ — validate scope alignment, architectural soundness, effort estimates, risk register. Approve mới được unlock Step 03 TDD; reject → loop back để Planner revise.',
+                agents: ['Planner Agent', 'Researcher Agent (Sepay)', 'Researcher Agent (eKYC)', 'Researcher Agent (SBV)', '👤 Human Tech Lead', '👤 Human PM'],
+                outputs: [
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/plan.md',
+                        path: 'plans/260505-1100-vietpay-mvp/plan.md',
+                        desc: 'Master plan: 8 phases · 12 tuần · critical path · Gantt timeline · resource allocation · risk register.',
+                        tags: [{ label: '8 phases', cls: '' }, { label: '12 weeks', cls: '' }, { label: 'Master', cls: 'priority' }],
+                        preview: '<span class="pc"># VietPay MVP — Master Plan</span>\n\n<span class="pk">Phase 01</span> <span class="pv">Infra Setup</span>           (week 1)\n<span class="pk">Phase 02</span> <span class="pv">Auth + eKYC</span>           (week 2-3) ⚡ critical\n<span class="pk">Phase 03</span> <span class="pv">Bank Account Linking</span>  (week 4)   ⚡ critical\n<span class="pk">Phase 04</span> <span class="pv">P2P Transfer Engine</span>   (week 5-7) ⚡ critical\n<span class="pk">Phase 05</span> <span class="pv">VietQR Payment</span>        (week 8-9)\n<span class="pk">Phase 06</span> <span class="pv">Transaction History</span>   (week 10)\n<span class="pk">Phase 07</span> <span class="pv">Notifications</span>          (week 11)\n<span class="pk">Phase 08</span> <span class="pv">Hardening + Launch</span>    (week 12)'
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-01-infrastructure-setup.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-01-infrastructure-setup.md',
+                        desc: 'Phase 01: AWS Organizations · Terraform IaC · ECS Fargate · RDS Multi-AZ · MSK Kafka · CI/CD pipeline.',
+                        tags: [{ label: 'Week 1', cls: '' }, { label: '30 todos', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-02-auth-ekyc.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-02-auth-ekyc.md',
+                        desc: 'Phase 02: OTP + JWT + biometric + VNPT eKYC + manual review queue + audit log.',
+                        tags: [{ label: 'Week 2-3', cls: '' }, { label: '47 todos', cls: '' }, { label: 'critical', cls: 'priority' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-03-bank-account-linking.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-03-bank-account-linking.md',
+                        desc: 'Phase 03: Sepay micro-deposit verify · top 10 banks VN · idempotent topup · webhook dedup.',
+                        tags: [{ label: 'Week 4', cls: '' }, { label: '26 todos', cls: '' }, { label: 'critical', cls: 'priority' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-04-p2p-transfer-engine.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-04-p2p-transfer-engine.md',
+                        desc: 'Phase 04 (longest): Idempotency Redis SETNX · double-entry ledger · SELECT FOR UPDATE · chaos test 1000 concurrent.',
+                        tags: [{ label: 'Week 5-7', cls: '' }, { label: '34 todos', cls: '' }, { label: 'critical', cls: 'priority' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-05-vietqr-payment.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-05-vietqr-payment.md',
+                        desc: 'Phase 05: VietQR EMV format · scan + generate · cross-bank compatibility test 10 banks.',
+                        tags: [{ label: 'Week 8-9', cls: '' }, { label: '25 todos', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-06-transaction-history.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-06-transaction-history.md',
+                        desc: 'Phase 06: cursor pagination · auto-categorize merchant + ML · CSV export · spending insights.',
+                        tags: [{ label: 'Week 10', cls: '' }, { label: '28 todos', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-07-notifications.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-07-notifications.md',
+                        desc: 'Phase 07: FCM + APNs · multi-device dispatch · i18n VN/EN · granular preferences · in-app inbox 90-day.',
+                        tags: [{ label: 'Week 11', cls: '' }, { label: '30 todos', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-mvp/phase-08-hardening-launch.md',
+                        path: 'plans/260505-1100-vietpay-mvp/phase-08-hardening-launch.md',
+                        desc: 'Phase 08: load test 200k · chaos engineering · pen test · App Store submission · SBV licence · public launch.',
+                        tags: [{ label: 'Week 12', cls: '' }, { label: '50 todos', cls: '' }, { label: 'critical', cls: 'priority' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/system-architecture.md',
+                        path: 'docs/system-architecture.md',
+                        desc: 'Microservices: 6 services + Kafka event bus + database-per-service + API Gateway. Multi-region AWS · cost ~$3,570/mo @ 50k MAU.',
+                        tags: [{ label: '6 services', cls: '' }, { label: 'Event-driven', cls: '' }, { label: 'Multi-region', cls: '' }],
+                        preview: '<span class="pc"># Service Topology</span>\n\n  api-gateway (Kong) → 6 services\n    ├─ <span class="pv">auth-service</span>      (PostgreSQL + Redis)\n    ├─ <span class="pv">kyc-service</span>       (PostgreSQL + S3 for ID)\n    ├─ <span class="pv">wallet-service</span>    (PostgreSQL — ledger)\n    ├─ <span class="pv">transfer-service</span>  (PostgreSQL + Redis lock)\n    ├─ <span class="pv">payment-service</span>   (Sepay adapter + Redis)\n    └─ <span class="pv">notification-service</span> (FCM + APNs)\n\n  <span class="pk">Event Bus:</span> <span class="pv">Kafka (transaction.created, transfer.completed)</span>'
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/plan-review-checklist-260605.md',
+                        desc: '👤 Human Gate output: Tech Lead + PM review plan, tick checklist 6 sections (scope · architecture · effort · risk · dependencies · success criteria). Status: APPROVED · ready for TDD.',
+                        tags: [{ label: 'APPROVED', cls: 'success' }, { label: 'Human Gate', cls: 'priority' }, { label: '6 sections', cls: '' }],
+                        preview: '<span class="pc"># Plan Review Checklist · VietPay MVP</span>\n\n<span class="pk">Reviewers:</span>\n  - <span class="pv">Tech Lead</span>  (Long N.)  ✓\n  - <span class="pv">PM</span>         (Quân T.)  ✓\n\n<span class="pc">## Sections</span>\n  ✓ <span class="pk">[1] Scope alignment</span>     — matches PRD\n  ✓ <span class="pk">[2] Architecture</span>         — microservices sound\n  ✓ <span class="pk">[3] Effort estimate</span>      — 12 weeks realistic\n  ✓ <span class="pk">[4] Risk register</span>        — 7 risks · all mitigated\n  ✓ <span class="pk">[5] Dependencies</span>         — Sepay/VNPT contracts ready\n  ✓ <span class="pk">[6] Success criteria</span>     — measurable\n\n<span class="pk">Decision:</span> <span class="pv">APPROVED · unlock Step 03 TDD</span>'
+                    },
+                    {
+                        type: 'doc', name: 'docs/human-roles-step-02.md',
+                        desc: 'Định nghĩa rõ vai trò của Human trong Planning Gate: WHO reviews, WHAT they validate, WHEN to approve/reject, HOW to escalate.',
+                        tags: [{ label: 'RACI', cls: '' }, { label: 'Governance', cls: '' }],
+                        preview: '<span class="pc"># Human Role · Planning Gate</span>\n\n<span class="pk">WHO:</span>\n  - <span class="pv">Tech Lead</span>   (architecture · feasibility)\n  - <span class="pv">PM</span>          (scope · timeline · resource)\n  - <span class="pv">PO (optional)</span> (business priority)\n\n<span class="pk">WHAT to validate:</span>\n  - Plan có đúng PRD scope không?\n  - Architecture decisions có sound không?\n  - Effort 12 weeks có realistic không?\n  - Risks identified đầy đủ + mitigated?\n  - Critical path đúng?\n\n<span class="pk">WHEN approve:</span>\n  - All 6 checklist sections ✓\n  - Zero blocking concern\n\n<span class="pk">WHEN reject:</span>\n  - Major scope mismatch → Planner Agent revise\n  - Architecture concern → Researcher re-investigate\n\n<span class="pk">SLA:</span> review trong 48h từ khi plan ready'
+                    }
+                ]
+            },
+            '2': {
+                num: '02', colorClass: 'step-3', title: 'TDD · Superpowers',
+                description: 'Theo framework <b>obra/superpowers</b> — chu kỳ TDD 6 bước: (1) 🔴 <b>RED</b> viết test fail tối thiểu, (2) ✅ <b>Verify RED</b> kiểm tra test fail vì đúng lý do (decision gate), (3) 🟢 <b>GREEN</b> code tối thiểu để pass, (4) ✅ <b>Verify GREEN</b> full suite xanh + không regression (decision gate), (5) 🔵 <b>REFACTOR</b> clean trong khi vẫn giữ xanh, (6) loop sang behavior kế tiếp. Rule cứng: <i>"NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"</i> — bất kỳ code nào viết trước test đều phải xóa và viết lại theo TDD. Source: <code>skills/test-driven-development/SKILL.md</code>.',
+                agents: ['Tester Agent (RED)', 'Developer Agent (GREEN)', 'Refactor pass'],
+                outputs: [
+                    {
+                        type: 'code', name: 'src/services/transfer-service/transfer.service.ts',
+                        desc: 'Core logic: idempotency check (Redis SETNX) → debit sender wallet → credit recipient → emit Kafka event. Atomic via PostgreSQL SELECT FOR UPDATE.',
+                        tags: [{ label: '184 LOC', cls: '' }, { label: 'NestJS', cls: '' }],
+                        preview: '<span class="pk">async</span> <span class="pv">transfer</span>(dto: TransferDto, idemKey: <span class="pk">string</span>) {\n  <span class="pc">// 1. Idempotency guard (Redis SETNX, 24h TTL)</span>\n  <span class="pk">const</span> locked = <span class="pk">await</span> redis.setnx(`tx:${idemKey}`, <span class="pv">"1"</span>);\n  <span class="pk">if</span> (!locked) <span class="pk">return</span> <span class="pk">await</span> <span class="pv">this</span>.findExisting(idemKey);\n\n  <span class="pc">// 2. Atomic debit + credit (FOR UPDATE)</span>\n  <span class="pk">return</span> <span class="pk">await</span> <span class="pv">this</span>.db.transaction(<span class="pk">async</span> (tx) =&gt; {\n    <span class="pk">await</span> tx.<span class="pv">debitWallet</span>(dto.fromId, dto.amount);\n    <span class="pk">await</span> tx.<span class="pv">creditWallet</span>(dto.toId, dto.amount);\n    <span class="pk">await</span> kafka.<span class="pv">emit</span>(<span class="pv">"transfer.completed"</span>, ...);\n  });\n}'
+                    },
+                    {
+                        type: 'code', name: 'src/services/payment-service/sepay-adapter.ts',
+                        desc: 'Sepay VietQR generator + bank webhook receiver. Verify HMAC-SHA256 signature, parse VietQR EMV format, retry với exponential backoff.',
+                        tags: [{ label: '142 LOC', cls: '' }, { label: 'Sepay', cls: '' }]
+                    },
+                    {
+                        type: 'code', name: 'src/services/kyc-service/vnpt-ekyc.adapter.ts',
+                        desc: 'VNPT eKYC integration: CMND/CCCD OCR + face matching + liveness detection. Encrypt KYC data tại rest (AES-256-GCM).',
+                        tags: [{ label: 'AES-256', cls: 'success' }]
+                    },
+                    {
+                        type: 'code', name: 'src/api/v1/transfers.controller.ts',
+                        desc: 'POST /api/v1/transfers · GET /api/v1/transfers/:id · GET /api/v1/transfers (paginated history).',
+                        tags: [{ label: 'REST API', cls: '' }]
+                    },
+                    {
+                        type: 'code', name: 'migrations/20260505_001_create_wallets_table.sql',
+                        desc: 'Tạo bảng wallets + transactions với double-entry ledger pattern, indexes cho user_id + created_at.',
+                        preview: '<span class="pk">CREATE TABLE</span> wallets (\n  id           <span class="pv">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>,\n  user_id      <span class="pv">UUID NOT NULL REFERENCES users(id)</span>,\n  balance      <span class="pv">BIGINT NOT NULL DEFAULT 0 CHECK (balance &gt;= 0)</span>,\n  currency     <span class="pv">CHAR(3) NOT NULL DEFAULT \'VND\'</span>,\n  status       <span class="pv">wallet_status NOT NULL DEFAULT \'active\'</span>,\n  created_at   <span class="pv">TIMESTAMPTZ NOT NULL DEFAULT NOW()</span>,\n  <span class="pk">UNIQUE</span> (user_id, currency)\n);'
+                    },
+                    {
+                        type: 'code', name: 'mobile/screens/TransferScreen.tsx',
+                        desc: 'React Native screen: phone/QR picker, amount input với VND format, biometric confirm (Face ID / Fingerprint), success animation Lottie.',
+                        tags: [{ label: 'RN + Expo', cls: '' }, { label: 'Biometric', cls: '' }]
+                    },
+                    {
+                        type: 'code', name: 'mobile/screens/QRScanScreen.tsx',
+                        desc: 'Camera + Vision Camera để scan VietQR EMV, parse merchant info, navigate sang confirm screen.',
+                        tags: [{ label: 'VietQR EMV', cls: '' }]
+                    },
+                    {
+                        type: 'code', name: 'config/.env.production.encrypted',
+                        desc: 'Production secrets: DB credentials, Sepay API key, VNPT eKYC token, FCM/APNs keys. Mã hóa qua AWS KMS.',
+                        tags: [{ label: 'AWS KMS', cls: 'success' }]
+                    },
+                    {
+                        type: 'test', name: 'tests/unit/transfer-service.spec.ts',
+                        desc: '47 unit tests cover: idempotency replay, double-spend prevention, balance overflow, currency mismatch, race condition.',
+                        tags: [{ label: '47 tests', cls: '' }, { label: '96% coverage', cls: 'success' }],
+                        preview: '<span class="pk">describe</span>(<span class="pv">"TransferService"</span>, () =&gt; {\n  <span class="pk">it</span>(<span class="pv">"prevents double-spend on retry với same idem-key"</span>, ...);\n  <span class="pk">it</span>(<span class="pv">"rolls back when recipient wallet locked"</span>, ...);\n  <span class="pk">it</span>(<span class="pv">"rejects amount &gt; daily limit (100M VND)"</span>, ...);\n  <span class="pk">it</span>(<span class="pv">"emits transfer.completed event sau khi commit"</span>, ...);\n  <span class="pk">it</span>(<span class="pv">"handles concurrent transfers với SELECT FOR UPDATE"</span>, ...);\n});\n\n<span class="pc">// Pass: 47/47 · Coverage: 96.2% lines, 91% branches</span>'
+                    },
+                    {
+                        type: 'test', name: 'tests/integration/sepay-webhook.spec.ts',
+                        desc: 'Test webhook signature verification (valid/invalid HMAC), idempotency, replay attack protection.',
+                        tags: [{ label: '12 tests', cls: '' }]
+                    },
+                    {
+                        type: 'test', name: 'tests/e2e/p2p-transfer-happy-path.detox.ts',
+                        desc: 'Detox E2E test trên iOS Simulator + Android Emulator: login → enter PIN → search recipient → enter 50k VND → biometric → verify success screen.',
+                        tags: [{ label: 'iOS + Android', cls: '' }]
+                    },
+                    {
+                        type: 'test', name: 'tests/load/transfer-throughput.k6.js',
+                        desc: 'k6 load test: 1000 concurrent users, 60s ramp-up · Result: p50 87ms · p95 184ms · p99 312ms · 0% error.',
+                        tags: [{ label: 'p95: 184ms', cls: 'success' }, { label: '0 errors', cls: 'success' }]
+                    },
+                    {
+                        type: 'test', name: 'coverage/lcov-report/index.html',
+                        desc: 'Tổng coverage: 91.4% line · 87.2% branch · 94.8% function. Lowest module: notification-service (76%).',
+                        tags: [{ label: '91.4% line', cls: 'success' }]
+                    },
+                    {
+                        type: 'test', name: 'plans/reports/tester-260605-mvp-test-results.md',
+                        desc: 'Tổng: 220 tests · Pass 218 · Fail 2 (race condition trong transfer-service khi 2 user transfer đồng thời cùng nhận). Recommendation: thêm SELECT FOR UPDATE.',
+                        tags: [{ label: '218/220 pass', cls: 'warn' }, { label: '2 failures', cls: 'warn' }]
+                    }
+                ]
+            },
+            '3': {
+                num: '03', colorClass: 'step-4', title: 'Code Review',
+                description: 'Reviewer Agent audit chất lượng code, OWASP Top 10 + STRIDE security, performance bottleneck. Phát hiện 14 findings (3 high) — major: race condition trong transfer-service, SQL injection risk trong query history, missing TLS 1.2 enforcement giữa internal services.',
+                agents: ['Code Reviewer Agent', 'Security Audit Agent'],
+                outputs: [
+                    {
+                        type: 'review', name: 'plans/reports/code-review-260605-vietpay-mvp.md',
+                        desc: '14 findings (3 high · 6 medium · 5 low). High: race condition wallet update, missing idempotency on retry path, N+1 query trong history.',
+                        tags: [{ label: '3 HIGH', cls: 'warn' }, { label: '6 MED', cls: '' }, { label: '5 LOW', cls: '' }],
+                        preview: '<span class="pc"># Findings Summary</span>\n\n<span class="pk">[HIGH-01]</span> <span class="pv">transfer.service.ts:67</span>\n  Race condition: 2 concurrent transfers tới cùng wallet\n  có thể double-credit. Cần SELECT FOR UPDATE.\n\n<span class="pk">[HIGH-02]</span> <span class="pv">transactions.repository.ts:42</span>\n  String concat trong query → SQL injection risk\n  Fix: dùng parameterized query.\n\n<span class="pk">[HIGH-03]</span> <span class="pv">api/transfers.controller.ts:23</span>\n  Retry path không check Idempotency-Key\n  → có thể duplicate transfer.'
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/security-audit-260605.md',
+                        desc: 'OWASP Top 10 + STRIDE + PCI-DSS scan. 2 findings: A01 broken access control trên admin endpoint, missing TLS 1.2 enforcement service-to-service.',
+                        tags: [{ label: 'OWASP', cls: '' }, { label: 'PCI-DSS', cls: '' }, { label: 'STRIDE', cls: '' }],
+                        preview: '<span class="pc"># Security Findings</span>\n\n<span class="pk">[CRITICAL]</span> <span class="pv">A01 Broken Access Control</span>\n  GET /admin/users không check role admin\n  → bất kỳ user authenticated truy cập được PII.\n\n<span class="pk">[HIGH]</span> <span class="pv">Insecure Internal Comms</span>\n  Service-to-service không enforce TLS 1.2+\n  → MITM risk trong VPC.\n\n<span class="pc">// AML/KYC: ✓ pass</span>\n<span class="pc">// PCI-DSS Level 1: ✓ pass</span>'
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/performance-260605.md',
+                        desc: 'Bottleneck analysis: N+1 query trong GET /transfers (mỗi transfer query 1 lần user). Recommendation: eager-load + cursor pagination.',
+                        tags: [{ label: 'N+1 detected', cls: 'warn' }],
+                        preview: '<span class="pc"># Performance Bottlenecks</span>\n\n<span class="pk">[1]</span> <span class="pv">GET /api/v1/transfers</span>\n  N+1 query: 1 SELECT transfers + N SELECT users\n  Current: <span class="pv">~840ms p95</span> với 50 transfers\n  Fix: <span class="pv">JOIN users + cursor pagination</span>\n  Target: <span class="pv">&lt; 150ms p95</span>\n\n<span class="pk">[2]</span> <span class="pv">Wallet balance lookup</span>\n  Hot path không cache → 100% DB hit\n  Fix: <span class="pv">Redis cache 30s TTL + invalidate on tx</span>'
+                    }
+                ]
+            },
+            '4': {
+                num: '04', colorClass: 'step-5', title: '👤 Human Final Review',
+                description: 'Human Reviewer (Tech Lead + Product Owner) đánh giá tổng thể toàn bộ AI artifacts từ Step 00–04 trước khi cho phép deploy. Đây là production-readiness gate cuối cùng — verify business fit, validate quality, đánh giá production risk. Reject → loop back tới phase liên quan để revise; Approve → unlock Step 06 Delivery.',
+                agents: ['Human Tech Lead', 'Human Product Owner', 'Human QA Lead'],
+                outputs: [
+                    {
+                        type: 'review', name: 'plans/reports/human-final-review-260605.md',
+                        desc: 'Sign-off checklist của Human reviewers: business fit · architecture soundness · code quality · test coverage · security posture · production risk · rollback plan.',
+                        tags: [{ label: 'APPROVED', cls: 'success' }, { label: '7 sections', cls: '' }, { label: 'Sign-off gate', cls: 'priority' }],
+                        preview: '<span class="pc"># Human Final Review · VietPay MVP</span>\n\n<span class="pk">Reviewers:</span>\n  - <span class="pv">Tech Lead</span>     (Long N.)   ✓ Approved\n  - <span class="pv">Product Owner</span> (Linh M.)   ✓ Approved\n  - <span class="pv">QA Lead</span>       (Tuấn P.)   ✓ Approved\n\n<span class="pc">## Sign-off Sections</span>\n  ✓ <span class="pk">[1]</span> Business Fit          <span class="pv">— matches PRD scope</span>\n  ✓ <span class="pk">[2]</span> Architecture          <span class="pv">— microservices sound</span>\n  ✓ <span class="pk">[3]</span> Code Quality          <span class="pv">— 96% cov · clean</span>\n  ✓ <span class="pk">[4]</span> Test Coverage         <span class="pv">— 218/220 pass</span>\n  ✓ <span class="pk">[5]</span> Security Posture      <span class="pv">— OWASP clean</span>\n  ✓ <span class="pk">[6]</span> Production Risk       <span class="pv">— low · monitored</span>\n  ✓ <span class="pk">[7]</span> Rollback Plan         <span class="pv">— documented</span>\n\n<span class="pk">Decision:</span> <span class="pv">PROCEED to deploy</span>'
+                    },
+                    {
+                        type: 'doc', name: 'plans/reports/business-fit-validation.md',
+                        desc: 'PO validate scope alignment: 8 P0 user stories implemented · 0 deviation · NPS pre-launch survey internal team 4.6/5.',
+                        tags: [{ label: '8/8 stories', cls: 'success' }, { label: 'NPS 4.6', cls: 'success' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/production-risk-assessment.md',
+                        desc: 'Tech Lead đánh giá rủi ro production: 3 risks (medium): peak load > forecast, Sepay degradation, eKYC manual review queue overflow. Mitigation đã prepare.',
+                        tags: [{ label: '3 MED risks', cls: 'warn' }, { label: 'Mitigated', cls: 'success' }],
+                        preview: '<span class="pc"># Production Risk Assessment</span>\n\n<span class="pk">[MED-01]</span> <span class="pv">Peak load &gt; forecast</span>\n  Day-1 launch traffic không predict được\n  <span class="pk">Mitigation:</span> ECS auto-scale 2→20 + circuit breaker\n\n<span class="pk">[MED-02]</span> <span class="pv">Sepay degradation</span>\n  Sepay sandbox SLA 99% — prod có thể tệ hơn\n  <span class="pk">Mitigation:</span> queue + retry + user-facing degradation message\n\n<span class="pk">[MED-03]</span> <span class="pv">eKYC review queue</span>\n  5-8% manual review — peak có thể ngập\n  <span class="pk">Mitigation:</span> 24h SLA + auto-page on backlog &gt; 100'
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/qa-acceptance-test.md',
+                        desc: 'QA Lead final acceptance test: 24 user stories E2E thực thi trên TestFlight + Play Store internal. Pass 24/24, zero P0/P1 bugs.',
+                        tags: [{ label: '24/24 pass', cls: 'success' }, { label: 'Zero P0/P1', cls: 'success' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/reports/rollback-plan.md',
+                        desc: 'Rollback procedure nếu launch fail: feature flag kill switch · CDK stack rollback · DB point-in-time restore · communication template cho user.',
+                        tags: [{ label: 'RTO < 15 min', cls: 'success' }, { label: 'Documented', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/reports/go-no-go-meeting-minutes.md',
+                        desc: 'Biên bản họp Go/No-Go cuối cùng giữa Tech Lead, PO, QA Lead, Compliance. Decision: GO. Action items: monitor first 48h hyper-care.',
+                        tags: [{ label: 'GO ✓', cls: 'success' }]
+                    }
+                ]
+            },
+            '5': {
+                num: '05', colorClass: 'step-6', title: 'Delivery & Deploy',
+                description: 'Auto-commit conventional cho 47 commits, tạo PR #142 với summary + test plan + screenshots, deploy tới ECS (Singapore + Frankfurt regions), publish iOS TestFlight + Play Store internal track, sync changelog + roadmap.',
+                agents: ['Git Manager Agent', 'DevOps Agent', 'Docs Manager Agent'],
+                outputs: [
+                    {
+                        type: 'deploy', name: 'git log (47 commits)',
+                        desc: 'Conventional commits: 24 feat · 11 fix · 6 refactor · 4 test · 2 docs. Không AI references.',
+                        tags: [{ label: '47 commits', cls: '' }, { label: 'Conventional', cls: 'success' }],
+                        preview: '<span class="pv">feat(transfer)</span>: add P2P money transfer với idempotency key\n<span class="pv">feat(qr)</span>:       integrate Sepay VietQR generation\n<span class="pv">feat(kyc)</span>:      VNPT eKYC adapter với liveness detection\n<span class="pv">fix(security)</span>: parameterized query trong transactions repo\n<span class="pv">fix(transfer)</span>: add SELECT FOR UPDATE để fix race condition\n<span class="pv">refactor</span>:     extract wallet ledger into shared module\n<span class="pv">test(e2e)</span>:    add Detox suite cho QR payment flow'
+                    },
+                    {
+                        type: 'deploy', name: 'GitHub PR #142',
+                        desc: 'PR title: "feat: VietPay MVP — P2P Transfer + VietQR Payment". Body có summary, test plan checklist, demo video, screenshots iOS + Android.',
+                        tags: [{ label: 'PR #142', cls: '' }, { label: '+8.4k −1.2k', cls: '' }, { label: '12 reviewers', cls: '' }]
+                    },
+                    {
+                        type: 'deploy', name: 'Production deployment',
+                        desc: 'Backend: ECS Fargate (ap-southeast-1 + eu-central-1) · RDS Multi-AZ · ElastiCache · Mobile: TestFlight build #142 · Play Store internal track.',
+                        tags: [{ label: 'v1.0.0', cls: 'success' }, { label: 'All green', cls: 'success' }],
+                        preview: '<span class="pc"># Deployment Status</span>\n\n<span class="pk">Backend (ECS Fargate)</span>\n  ap-southeast-1: <span class="pv">✓ healthy (12/12 tasks)</span>\n  eu-central-1:   <span class="pv">✓ healthy (8/8 tasks)</span>\n\n<span class="pk">Database (RDS PostgreSQL 16)</span>\n  Primary:        <span class="pv">✓ ap-southeast-1a</span>\n  Replica:        <span class="pv">✓ ap-southeast-1b</span>\n\n<span class="pk">Mobile</span>\n  iOS:            <span class="pv">TestFlight build #142</span>\n  Android:        <span class="pv">Play Store internal track</span>\n\n<span class="pk">Smoke tests:</span> <span class="pv">✓ 24/24 passed</span>'
+                    },
+                    {
+                        type: 'doc', name: 'docs/project-changelog.md',
+                        desc: 'v1.0.0 release notes: 8 user-facing features mới, 3 security fixes, performance improvements (history endpoint 840ms → 142ms p95).',
+                        tags: [{ label: 'v1.0.0', cls: 'success' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/development-roadmap.md',
+                        desc: 'Phase 1 (MVP) marked COMPLETE · Phase 2 (Bill payment + Top-up + Savings goals) starts next sprint · Phase 3 (Investing) backlog.',
+                        tags: [{ label: 'Phase 1 ✓', cls: 'success' }, { label: 'Phase 2 →', cls: '' }]
+                    }
+                ]
+            }
+        };
+
+        const BROWNFIELD_STEP_DATA = {
+            '0': {
+                num: '00', colorClass: 'step-7', title: '📚 Document Standardization',
+                description: 'Brownfield-specific entry step: chuẩn hoá tất cả tài liệu để pipeline đi tiếp giống hệt greenfield. AI parse customer-provided docs (requirements briefs, contracts), Reverse Engineer Agent extract architecture-as-is từ codebase V1, Gap Analyzer so sánh as-is vs to-be. Output là bộ docs chuẩn hoá (SRS · architecture · wireframe · gap analysis) — đồng bộ format với greenfield Step 00 để Step 01 Planning xử lý nhất quán.',
+                agents: ['Doc Parser Agent', 'Repomix Agent', 'Reverse Engineer Agent', 'Gap Analyzer Agent', 'Change Impact Mapper'],
+                outputs: [
+                    {
+                        type: 'user', name: 'customer-input/v2-requirements-brief.docx',
+                        desc: 'Brief từ khách hàng (PO của VietPay): "V2 cần add bill payment EVN/Internet/Mobile + top-up. Volumetric estimate 50k tx/day. Q3 launch."',
+                        tags: [{ label: 'Customer doc', cls: '' }, { label: 'Input', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/codebase-summary.md',
+                        path: 'docs/codebase-summary.md',
+                        desc: 'Tổng quan codebase V1: 124k LOC TypeScript, 6 microservices (auth, kyc, wallet, transfer, payment, notification), 89 API endpoints, 47 DB tables.',
+                        tags: [{ label: '124k LOC', cls: '' }, { label: '6 services', cls: '' }, { label: '4 years old', cls: '' }],
+                        preview: '<span class="pc"># VietPay V1 — Codebase Summary</span>\n\n<span class="pk">Languages:</span>\n  - TypeScript: <span class="pv">102k LOC (82%)</span>\n  - SQL:        <span class="pv">14k LOC</span>\n  - YAML:       <span class="pv">8k LOC (CDK + k8s)</span>\n\n<span class="pk">Services (NestJS):</span>\n  - auth-service          <span class="pv">12k LOC · last touched 3 days ago</span>\n  - kyc-service           <span class="pv">8k LOC · stable</span>\n  - wallet-service        <span class="pv">18k LOC · ⚠ god module</span>\n  - transfer-service      <span class="pv">26k LOC · hot path</span>\n  - payment-service       <span class="pv">22k LOC · Sepay integration</span>\n  - notification-service  <span class="pv">9k LOC · stable</span>'
+                    },
+                    {
+                        type: 'doc', name: 'docs/architecture-as-is.md',
+                        path: 'docs/architecture-as-is.md',
+                        desc: 'Architecture-as-is diagram + integration map + data flow. Phát hiện shared DB giữa wallet-service và transfer-service (anti-pattern), bill-payment chưa có module.',
+                        tags: [{ label: 'As-is', cls: '' }, { label: '⚠ Shared DB', cls: 'warn' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/srs-v2.md',
+                        path: 'docs/srs-v2.md',
+                        desc: 'SRS V2 chuẩn hoá từ customer brief — cùng format với greenfield SRS. 8 FR mới (bill payment 4 providers, mobile top-up 3 carriers) + 5 NFR + SBV/AML constraints.',
+                        tags: [{ label: '8 FR', cls: '' }, { label: '5 NFR', cls: '' }, { label: 'Standardized', cls: 'success' }]
+                    },
+                    {
+                        type: 'design', name: 'docs/wireframes/bill-payment-flow.md',
+                        desc: 'Wireframe chuẩn hoá cho 2 module mới: bill payment + mobile top-up. Reuse design system V1, format đồng bộ greenfield wireframes.',
+                        tags: [{ label: 'Wireframe', cls: '' }, { label: '11 screens', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/gap-analysis.md',
+                        path: 'docs/gap-analysis.md',
+                        desc: 'Gap analysis as-is vs to-be: 12 gaps identified — 4 new modules cần build, 3 existing services cần extend, 2 cần migration (shared DB), 3 minor polish.',
+                        tags: [{ label: '12 gaps', cls: '' }, { label: '4 new modules', cls: '' }, { label: '2 migrations', cls: 'warn' }],
+                        preview: '<span class="pc"># Gap Analysis · V1 → V2</span>\n\n<span class="pk">[GAP-01] Bill Payment Module</span>\n  As-is: ❌ none\n  To-be: ✅ EVN + Internet + Mobile + Water\n  <span class="pk">Type:</span> NEW MODULE\n\n<span class="pk">[GAP-02] Mobile Top-up</span>\n  As-is: ❌ none\n  To-be: ✅ Viettel/Vinaphone/Mobifone\n  <span class="pk">Type:</span> NEW MODULE\n\n<span class="pk">[GAP-03] Shared DB Anti-pattern</span>\n  As-is: wallet + transfer share `vietpay` schema\n  To-be: separate per-service DB\n  <span class="pk">Type:</span> MIGRATION (high risk)'
+                    },
+                    {
+                        type: 'doc', name: 'docs/change-impact-map.md',
+                        desc: 'Modules / endpoints / DB tables affected bởi V2: 23 endpoints touched, 8 DB tables migrated, 4 services restructured.',
+                        tags: [{ label: '23 endpoints', cls: '' }, { label: '8 tables', cls: '' }]
+                    },
+                    {
+                        type: 'doc', name: 'docs/tech-debt-inventory.md',
+                        desc: 'Tech debt inventory: 14 god classes (>500 LOC), 23 deprecated dependencies, 0 tests cho 4 critical modules. Input cho risk register Step 01.',
+                        tags: [{ label: '14 god classes', cls: 'warn' }, { label: '0% test cov · 4 modules', cls: 'warn' }]
+                    }
+                ]
+            },
+            '1': {
+                num: '01', colorClass: 'step-2', title: 'Planning + Human Gate',
+                description: 'Strategist Agent đề xuất migration strategy. Cho V1 wallet/transfer shared-DB → strangler fig (dual-write 2 tuần, sau đó cutover). Risk register tập trung regression hot spots. **Human Gate**: Tech Lead + PM + Customer SME approve strategy trước khi đụng code.',
+                agents: ['Migration Strategist', 'Risk Analyzer', 'Test Coverage Planner', '👤 Human Tech Lead', '👤 Human Customer SME'],
+                outputs: [
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-v2/migration-plan.md',
+                        path: 'plans/260505-1100-vietpay-v2/migration-plan.md',
+                        desc: 'Master migration plan: 8 weeks, strangler fig cho DB migration, 14 phased tasks, parallel write strategy, cutover plan.',
+                        tags: [{ label: '8 weeks', cls: '' }, { label: 'Strangler Fig', cls: '' }, { label: 'Master', cls: 'priority' }],
+                        preview: '<span class="pc"># V1 → V2 Migration Plan</span>\n\n<span class="pk">Strategy:</span> <span class="pv">Strangler Fig + Dual Write</span>\n\n<span class="pc">## Week-by-week</span>\n  <span class="pk">W1-2:</span> <span class="pv">Char. tests cho wallet+transfer existing</span>\n  <span class="pk">W3-4:</span> <span class="pv">Build new wallet-db schema (separate)</span>\n  <span class="pk">W5:</span>   <span class="pv">Dual-write enabled · monitor consistency</span>\n  <span class="pk">W6:</span>   <span class="pv">Read traffic 5% → 25% → 100% switch</span>\n  <span class="pk">W7:</span>   <span class="pv">Cutover · old DB read-only</span>\n  <span class="pk">W8:</span>   <span class="pv">Remove old DB + ship bill payment + topup</span>'
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-v2/risk-register.md',
+                        desc: '14 risks: 3 critical (data inconsistency dual-write, regression trong transfer, perf degradation peak). Mitigations + owner.',
+                        tags: [{ label: '3 CRIT', cls: 'warn' }, { label: '6 HIGH', cls: '' }, { label: 'All mitigated', cls: 'success' }]
+                    },
+                    {
+                        type: 'doc', name: 'plans/260505-1100-vietpay-v2/test-coverage-plan.md',
+                        desc: 'Plan đảm bảo coverage trước refactor: target 90% line cho hot path (wallet, transfer); characterization tests cho legacy-mapper.ts.',
+                        tags: [{ label: '90% target', cls: '' }, { label: 'Char. tests', cls: '' }]
+                    },
+                    {
+                        type: 'review', name: 'plans/reports/migration-plan-review-checklist.md',
+                        desc: '👤 Human Gate output: Tech Lead + PM + Customer SME approve. Sign-off 8 sections (strategy soundness, risk coverage, rollback plan, customer alignment, ...).',
+                        tags: [{ label: 'APPROVED', cls: 'success' }, { label: 'Human Gate', cls: 'priority' }, { label: 'Customer SME ✓', cls: 'success' }]
+                    }
+                ]
+            },
+            // Steps 02-05 identical to greenfield — see merge below
+        };
+        // Brownfield Step 02-05 phải giống y hệt greenfield (chỉ Step 00 + 01 khác).
+        // DRY: reference trực tiếp STEP_DATA thay vì duplicate.
+        BROWNFIELD_STEP_DATA['2'] = STEP_DATA['2'];
+        BROWNFIELD_STEP_DATA['3'] = STEP_DATA['3'];
+        BROWNFIELD_STEP_DATA['4'] = STEP_DATA['4'];
+        BROWNFIELD_STEP_DATA['5'] = STEP_DATA['5'];
+
+        let activePipeline = 'greenfield';
+        const PIPELINE_DATA = { greenfield: STEP_DATA, brownfield: BROWNFIELD_STEP_DATA };
+
+        function switchPipeline(name) {
+            if (name === activePipeline) return;
+            activePipeline = name;
+
+            document.querySelectorAll('.pipeline-tab').forEach(tab => {
+                const isActive = tab.dataset.pipeline === name;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+
+            document.querySelectorAll('.pipeline-greenfield').forEach(el => el.classList.toggle('hidden', name !== 'greenfield'));
+            document.querySelectorAll('.pipeline-brownfield').forEach(el => el.classList.toggle('hidden', name !== 'brownfield'));
+
+            const terminalTitle = document.getElementById('terminalTitle');
+            if (terminalTitle) terminalTitle.textContent = `workflow.pipeline — ${name} · ai-agent-orchestration`;
+
+            if (window.mermaid) {
+                const activeMermaid = document.querySelector(`.mermaid.pipeline-${name}`);
+                if (activeMermaid && !activeMermaid.dataset.processed) {
+                    try { mermaid.run({ nodes: [activeMermaid] }); activeMermaid.dataset.processed = '1'; } catch (e) {}
+                }
+            }
+        }
+
+        document.querySelectorAll('.pipeline-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchPipeline(tab.dataset.pipeline));
+        });
+
+        const modal = document.getElementById('stepModal');
+        const modalStepNum = document.getElementById('modalStepNum');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalAgents = document.getElementById('modalAgents');
+        const modalOutputs = document.getElementById('modalOutputs');
+        const modalClose = document.getElementById('modalClose');
+
+        function openModal(stepKey, pipelineOverride) {
+            const pipeline = pipelineOverride || activePipeline;
+            const data = (PIPELINE_DATA[pipeline] || STEP_DATA)[stepKey];
+            if (!data) return;
+
+            modalStepNum.textContent = data.num;
+            modalStepNum.className = 'step-num ' + data.colorClass;
+            modalTitle.textContent = data.title;
+            modalDescription.textContent = data.description;
+
+            modalAgents.innerHTML = data.agents
+                .map(a => `<span class="agent-tag">▸ ${a}</span>`).join('');
+
+            modalOutputs.innerHTML = data.outputs.map(o => {
+                const tagsHtml = (o.tags || []).map(t =>
+                    `<span class="output-tag ${t.cls || ''}">${escapeHtml(t.label)}</span>`
+                ).join('');
+                const metaHtml = tagsHtml ? `<div class="output-meta">${tagsHtml}</div>` : '';
+                const previewHtml = o.preview ? `<div class="output-preview">${o.preview}</div>` : '';
+                const viewBtn = o.path ? `<button class="output-view-btn" data-doc-path="${escapeHtml(o.path)}">📄 View document →</button>` : '';
+                return `
+                <li class="output-item">
+                    <span class="output-icon ${o.type}">${iconFor(o.type)}</span>
+                    <div class="output-content">
+                        <div class="output-name">${escapeHtml(o.name)}</div>
+                        <div class="output-desc">${escapeHtml(o.desc)}</div>
+                        ${metaHtml}
+                        ${previewHtml}
+                        ${viewBtn}
+                    </div>
+                </li>`;
+            }).join('');
+
+            modalOutputs.querySelectorAll('.output-view-btn').forEach(btn => {
+                btn.addEventListener('click', () => openDoc(btn.dataset.docPath));
+            });
+
+            closeDoc();
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            closeDoc();
+        }
+
+        const docViewer = document.getElementById('docViewer');
+        const docViewerPath = document.getElementById('docViewerPath');
+        const docViewerContent = document.getElementById('docViewerContent');
+        const docViewerBack = document.getElementById('docViewerBack');
+        const docViewerMain = document.getElementById('docViewerMain');
+        const docViewerTocList = document.getElementById('docViewerTocList');
+        const docViewerToc = document.getElementById('docViewerToc');
+        const docViewerToggleToc = document.getElementById('docViewerToggleToc');
+        const docViewerProgress = document.getElementById('docViewerProgress');
+        const stepModal = document.getElementById('stepModal');
+
+        if (window.marked) {
+            marked.setOptions({
+                gfm: true, breaks: false,
+                highlight: (code, lang) => {
+                    if (window.hljs && lang && hljs.getLanguage(lang)) {
+                        try { return hljs.highlight(code, { language: lang }).value; } catch (e) {}
+                    }
+                    return window.hljs ? hljs.highlightAuto(code).value : code;
+                }
+            });
+        }
+
+        function slugify(text) {
+            return String(text)
+                .toLowerCase()
+                .normalize('NFD')
+                .replaceAll(/[̀-ͯ]/g, '')
+                .replaceAll(/đ/g, 'd')
+                .replaceAll(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replaceAll(/\s+/g, '-')
+                .substring(0, 80) || 'section';
+        }
+
+        function buildTOC() {
+            const headings = docViewerContent.querySelectorAll('h1, h2, h3, h4');
+            docViewerTocList.innerHTML = '';
+            if (!headings.length) {
+                docViewerTocList.innerHTML = '<li class="doc-viewer-toc-empty">No sections</li>';
+                return [];
+            }
+            const usedIds = new Set();
+            const items = [];
+            headings.forEach(h => {
+                let id = slugify(h.textContent);
+                let unique = id, n = 2;
+                while (usedIds.has(unique)) unique = `${id}-${n++}`;
+                usedIds.add(unique);
+                h.id = unique;
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${unique}`;
+                a.textContent = h.textContent;
+                a.className = `toc-${h.tagName.toLowerCase()}`;
+                a.dataset.target = unique;
+                a.addEventListener('click', e => {
+                    e.preventDefault();
+                    const target = document.getElementById(unique);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    docViewerToc.classList.remove('open');
+                });
+                li.appendChild(a);
+                docViewerTocList.appendChild(li);
+                items.push({ id: unique, el: h, link: a });
+            });
+            return items;
+        }
+
+        function enhanceCodeBlocks() {
+            docViewerContent.querySelectorAll('pre').forEach(pre => {
+                const code = pre.querySelector('code');
+                if (!code) return;
+                const langMatch = (code.className || '').match(/language-(\w+)/);
+                const lang = langMatch ? langMatch[1] : '';
+                if (lang && lang !== 'mermaid') pre.dataset.lang = lang;
+
+                if (!pre.querySelector('.doc-viewer-copy-btn')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'doc-viewer-copy-btn';
+                    btn.textContent = '⧉ Copy';
+                    btn.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(code.textContent);
+                            btn.textContent = '✓ Copied';
+                            btn.classList.add('copied');
+                            setTimeout(() => {
+                                btn.textContent = '⧉ Copy';
+                                btn.classList.remove('copied');
+                            }, 1500);
+                        } catch (e) {
+                            btn.textContent = '✗ Failed';
+                        }
+                    });
+                    pre.appendChild(btn);
+                }
+            });
+        }
+
+        function wrapTables() {
+            docViewerContent.querySelectorAll('table').forEach(table => {
+                if (table.parentElement && table.parentElement.classList.contains('doc-viewer-table-wrap')) return;
+                const wrap = document.createElement('div');
+                wrap.className = 'doc-viewer-table-wrap';
+                table.parentNode.insertBefore(wrap, table);
+                wrap.appendChild(table);
+            });
+        }
+
+        let tocItems = [];
+        function setupScrollTracking() {
+            const onScroll = () => {
+                const scrollable = docViewerMain;
+                const scrollTop = scrollable.scrollTop;
+                const max = scrollable.scrollHeight - scrollable.clientHeight;
+                const pct = max > 0 ? Math.min(100, (scrollTop / max) * 100) : 0;
+                docViewerProgress.style.width = pct + '%';
+
+                if (!tocItems.length) return;
+                let activeIdx = 0;
+                const offset = scrollTop + 80;
+                for (let i = 0; i < tocItems.length; i++) {
+                    if (tocItems[i].el.offsetTop <= offset) activeIdx = i;
+                    else break;
+                }
+                tocItems.forEach((item, i) => item.link.classList.toggle('active', i === activeIdx));
+            };
+            docViewerMain.removeEventListener('scroll', docViewerMain._scrollHandler || (() => {}));
+            docViewerMain._scrollHandler = onScroll;
+            docViewerMain.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+        }
+
+        async function openDoc(path) {
+            docViewerPath.textContent = path;
+            docViewerContent.innerHTML = '<div class="doc-viewer-loading">Loading…</div>';
+            docViewerTocList.innerHTML = '';
+            docViewerProgress.style.width = '0%';
+            docViewer.classList.add('active');
+            stepModal.classList.add('viewing-doc');
+
+            try {
+                const res = await fetch(path);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const md = await res.text();
+                const html = marked.parse(md);
+                docViewerContent.innerHTML = html;
+
+                // Convert mermaid code blocks to mermaid divs
+                docViewerContent.querySelectorAll('pre code').forEach(block => {
+                    const langMatch = (block.className || '').match(/language-(\w+)/);
+                    if (langMatch && langMatch[1] === 'mermaid') {
+                        const pre = block.parentElement;
+                        const div = document.createElement('div');
+                        div.className = 'mermaid';
+                        div.textContent = block.textContent;
+                        pre.replaceWith(div);
+                    }
+                });
+
+                wrapTables();
+                enhanceCodeBlocks();
+                tocItems = buildTOC();
+                setupScrollTracking();
+
+                if (window.mermaid) {
+                    try { await mermaid.run({ nodes: docViewerContent.querySelectorAll('.mermaid') }); } catch (e) {}
+                }
+                docViewerMain.scrollTop = 0;
+            } catch (err) {
+                docViewerContent.innerHTML = `
+                    <div class="doc-viewer-error">
+                        <h3 style="color: var(--accent-amber); margin-bottom: 12px;">⚠ Cannot load document</h3>
+                        <p><strong>Path:</strong> <code>${escapeHtml(path)}</code></p>
+                        <p><strong>Error:</strong> ${escapeHtml(err.message)}</p>
+                        <p style="margin-top: 16px;">Browsers block local file fetches via <code>file://</code>. To view documents, serve via local HTTP server:</p>
+                        <pre style="background: #0a0e1a; padding: 12px; border-radius: 6px; margin-top: 8px;"><code>cd /Users/dangtuanphong/Desktop/AI-Workflow
+python3 -m http.server 8000</code></pre>
+                        <p style="margin-top: 12px;">Then open <code>http://localhost:8000/development-cycle.html</code></p>
+                        <p style="margin-top: 12px;">Or open the file directly: <a href="${escapeHtml(path)}" target="_blank">${escapeHtml(path)}</a></p>
+                    </div>`;
+                tocItems = [];
+                docViewerTocList.innerHTML = '<li class="doc-viewer-toc-empty">Document not loaded</li>';
+            }
+        }
+
+        function closeDoc() {
+            docViewer.classList.remove('active');
+            stepModal.classList.remove('viewing-doc');
+            docViewerToc.classList.remove('open');
+            docViewerContent.innerHTML = '';
+            docViewerTocList.innerHTML = '';
+            docViewerProgress.style.width = '0%';
+            tocItems = [];
+        }
+
+        docViewerBack.addEventListener('click', closeDoc);
+        docViewerToggleToc.addEventListener('click', () => docViewerToc.classList.toggle('open'));
+
+        function iconFor(type) {
+            const map = { doc: 'DOC', code: '{ }', test: 'TST', design: 'UI', deploy: '↗', review: 'AUD', user: 'USR' };
+            return map[type] || '•';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        document.querySelectorAll('.detail-card[data-step]').forEach(card => {
+            const pipeline = card.dataset.pipeline || 'greenfield';
+            card.addEventListener('click', () => openModal(card.dataset.step, pipeline));
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openModal(card.dataset.step, pipeline);
+                }
+            });
+        });
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+        });
+    </script>
+
+
+<div class="mermaidTooltip" style="opacity: 0; position: absolute; text-align: center; max-width: 200px; padding: 2px; font-size: 12px; background: rgb(255, 255, 222); border: 1px solid rgb(51, 51, 51); border-radius: 2px; pointer-events: none; z-index: 100;"></div><div style="color-scheme: unset; forced-color-adjust: unset; math-depth: unset; position: absolute; position-anchor: unset; text-size-adjust: unset; appearance: unset; color: unset; font: unset; font-palette: unset; font-synthesis: unset; position-area: unset; text-orientation: unset; text-rendering: unset; text-spacing-trim: unset; -webkit-font-smoothing: unset; -webkit-locale: unset; -webkit-text-orientation: unset; -webkit-writing-mode: unset; writing-mode: unset; zoom: unset; accent-color: unset; place-content: unset; place-items: unset; place-self: unset; alignment-baseline: unset; anchor-name: unset; anchor-scope: unset; animation-composition: unset; animation: unset; animation-trigger: unset; app-region: unset; aspect-ratio: unset; backdrop-filter: unset; backface-visibility: unset; background: unset; background-blend-mode: unset; baseline-shift: unset; baseline-source: unset; block-size: unset; border-block: unset; border: unset; border-radius: unset; border-collapse: unset; border-end-end-radius: unset; border-end-start-radius: unset; border-inline: unset; border-start-end-radius: unset; border-start-start-radius: unset; bottom: unset; box-decoration-break: unset; box-shadow: unset; box-sizing: unset; break-after: unset; break-before: unset; break-inside: unset; buffered-rendering: unset; caption-side: unset; caret-animation: unset; caret-color: unset; caret-shape: unset; clear: unset; clip: unset; clip-path: unset; clip-rule: unset; color-interpolation: unset; color-interpolation-filters: unset; color-rendering: unset; columns: unset; column-fill: unset; gap: unset; column-rule: unset; column-span: unset; contain: unset; contain-intrinsic-block-size: unset; contain-intrinsic-size: unset; contain-intrinsic-inline-size: unset; container: unset; content: unset; content-visibility: unset; corner-shape: unset; corner-block-end-shape: unset; corner-block-start-shape: unset; counter-increment: unset; counter-reset: unset; counter-set: unset; cursor: unset; cx: unset; cy: unset; d: unset; display: unset; dominant-baseline: unset; dynamic-range-limit: unset; empty-cells: unset; field-sizing: unset; fill: unset; fill-opacity: unset; fill-rule: unset; filter: unset; flex: unset; flex-flow: unset; float: unset; flood-color: unset; flood-opacity: unset; grid: unset; grid-area: unset; height: unset; hyphenate-character: unset; hyphenate-limit-chars: unset; hyphens: unset; image-orientation: unset; image-rendering: unset; initial-letter: unset; inline-size: unset; inset-block: unset; inset-inline: unset; interactivity: unset; interest-delay: unset; interpolate-size: unset; isolation: unset; left: 0px; letter-spacing: unset; lighting-color: unset; line-break: unset; list-style: unset; margin-block: unset; margin: unset; margin-inline: unset; marker: unset; mask: unset; mask-type: unset; math-shift: unset; math-style: unset; max-block-size: unset; max-height: unset; max-inline-size: unset; max-width: unset; min-block-size: unset; min-height: unset; min-inline-size: unset; min-width: unset; mix-blend-mode: unset; object-fit: unset; object-position: unset; object-view-box: unset; offset: unset; opacity: unset; order: unset; orphans: unset; outline: unset; outline-offset: unset; overflow-anchor: unset; overflow-block: unset; overflow-clip-margin: unset; overflow-inline: unset; overflow-wrap: unset; overflow: unset; overlay: unset; overscroll-behavior-block: unset; overscroll-behavior-inline: unset; overscroll-behavior: unset; padding-block: unset; padding: unset; padding-inline: unset; page: unset; page-orientation: unset; paint-order: unset; perspective: unset; perspective-origin: unset; pointer-events: unset; position-try: unset; position-visibility: unset; print-color-adjust: unset; quotes: unset; r: unset; reading-flow: unset; reading-order: unset; resize: unset; right: unset; rotate: unset; ruby-align: unset; ruby-position: unset; rx: unset; ry: unset; scale: unset; scroll-behavior: unset; scroll-initial-target: unset; scroll-margin-block: unset; scroll-margin: unset; scroll-margin-inline: unset; scroll-marker-group: unset; scroll-padding-block: unset; scroll-padding: unset; scroll-padding-inline: unset; scroll-snap-align: unset; scroll-snap-stop: unset; scroll-snap-type: unset; scroll-target-group: unset; scroll-timeline: unset; scrollbar-color: unset; scrollbar-gutter: unset; scrollbar-width: unset; shape-image-threshold: unset; shape-margin: unset; shape-outside: unset; shape-rendering: unset; size: unset; speak: unset; stop-color: unset; stop-opacity: unset; stroke: unset; stroke-dasharray: unset; stroke-dashoffset: unset; stroke-linecap: unset; stroke-linejoin: unset; stroke-miterlimit: unset; stroke-opacity: unset; stroke-width: unset; tab-size: unset; table-layout: unset; text-align: unset; text-align-last: unset; text-anchor: unset; text-autospace: unset; text-box: unset; text-combine-upright: unset; text-decoration: unset; text-decoration-skip-ink: unset; text-emphasis: unset; text-emphasis-position: unset; text-indent: unset; text-justify: unset; text-overflow: unset; text-shadow: unset; text-transform: unset; text-underline-offset: unset; text-underline-position: unset; text-wrap: unset; timeline-scope: unset; timeline-trigger: unset; top: 0px; touch-action: unset; transform: unset; transform-box: unset; transform-origin: unset; transform-style: unset; transition: unset; translate: unset; trigger-scope: unset; user-select: unset; vector-effect: unset; vertical-align: unset; view-timeline: unset; view-transition-class: unset; view-transition-group: unset; view-transition-name: unset; visibility: unset; border-spacing: unset; -webkit-box-align: unset; -webkit-box-decoration-break: unset; -webkit-box-direction: unset; -webkit-box-flex: unset; -webkit-box-ordinal-group: unset; -webkit-box-orient: unset; -webkit-box-pack: unset; -webkit-box-reflect: unset; -webkit-line-break: unset; -webkit-line-clamp: unset; -webkit-mask-box-image: unset; -webkit-rtl-ordering: unset; -webkit-ruby-position: unset; -webkit-tap-highlight-color: unset; -webkit-text-combine: unset; -webkit-text-decorations-in-effect: unset; -webkit-text-fill-color: unset; -webkit-text-security: unset; -webkit-text-stroke: unset; -webkit-user-drag: unset; white-space-collapse: unset; widows: unset; width: unset; will-change: unset; word-break: unset; word-spacing: unset; x: unset; y: unset; z-index: unset;"><div style="color-scheme: unset; forced-color-adjust: unset; math-depth: unset; position: absolute; position-anchor: unset; text-size-adjust: unset; appearance: unset; color: unset; font: unset; font-palette: unset; font-synthesis: unset; position-area: unset; text-orientation: unset; text-rendering: unset; text-spacing-trim: unset; -webkit-font-smoothing: unset; -webkit-locale: unset; -webkit-text-orientation: unset; -webkit-writing-mode: unset; writing-mode: unset; zoom: unset; accent-color: unset; place-content: unset; place-items: unset; place-self: unset; alignment-baseline: unset; anchor-name: unset; anchor-scope: unset; animation-composition: unset; animation: unset; animation-trigger: unset; app-region: unset; aspect-ratio: unset; backdrop-filter: unset; backface-visibility: unset; background: unset; background-blend-mode: unset; baseline-shift: unset; baseline-source: unset; block-size: unset; border-block: unset; border: unset; border-radius: unset; border-collapse: unset; border-end-end-radius: unset; border-end-start-radius: unset; border-inline: unset; border-start-end-radius: unset; border-start-start-radius: unset; bottom: unset; box-decoration-break: unset; box-shadow: unset; box-sizing: unset; break-after: unset; break-before: unset; break-inside: unset; buffered-rendering: unset; caption-side: unset; caret-animation: unset; caret-color: unset; caret-shape: unset; clear: unset; clip: unset; clip-path: unset; clip-rule: unset; color-interpolation: unset; color-interpolation-filters: unset; color-rendering: unset; columns: unset; column-fill: unset; gap: unset; column-rule: unset; column-span: unset; contain: unset; contain-intrinsic-block-size: unset; contain-intrinsic-size: unset; contain-intrinsic-inline-size: unset; container: unset; content: unset; content-visibility: unset; corner-shape: unset; corner-block-end-shape: unset; corner-block-start-shape: unset; counter-increment: unset; counter-reset: unset; counter-set: unset; cursor: unset; cx: unset; cy: unset; d: unset; display: unset; dominant-baseline: unset; dynamic-range-limit: unset; empty-cells: unset; field-sizing: unset; fill: unset; fill-opacity: unset; fill-rule: unset; filter: unset; flex: unset; flex-flow: unset; float: unset; flood-color: unset; flood-opacity: unset; grid: unset; grid-area: unset; height: unset; hyphenate-character: unset; hyphenate-limit-chars: unset; hyphens: unset; image-orientation: unset; image-rendering: unset; initial-letter: unset; inline-size: unset; inset-block: unset; inset-inline: unset; interactivity: unset; interest-delay: unset; interpolate-size: unset; isolation: unset; left: 0px; letter-spacing: unset; lighting-color: unset; line-break: unset; list-style: unset; margin-block: unset; margin: unset; margin-inline: unset; marker: unset; mask: unset; mask-type: unset; math-shift: unset; math-style: unset; max-block-size: unset; max-height: unset; max-inline-size: unset; max-width: unset; min-block-size: unset; min-height: unset; min-inline-size: unset; min-width: unset; mix-blend-mode: unset; object-fit: unset; object-position: unset; object-view-box: unset; offset: unset; opacity: unset; order: unset; orphans: unset; outline: unset; outline-offset: unset; overflow-anchor: unset; overflow-block: unset; overflow-clip-margin: unset; overflow-inline: unset; overflow-wrap: unset; overflow: unset; overlay: unset; overscroll-behavior-block: unset; overscroll-behavior-inline: unset; overscroll-behavior: unset; padding-block: unset; padding: unset; padding-inline: unset; page: unset; page-orientation: unset; paint-order: unset; perspective: unset; perspective-origin: unset; pointer-events: unset; position-try: unset; position-visibility: unset; print-color-adjust: unset; quotes: unset; r: unset; reading-flow: unset; reading-order: unset; resize: unset; right: unset; rotate: unset; ruby-align: unset; ruby-position: unset; rx: unset; ry: unset; scale: unset; scroll-behavior: unset; scroll-initial-target: unset; scroll-margin-block: unset; scroll-margin: unset; scroll-margin-inline: unset; scroll-marker-group: unset; scroll-padding-block: unset; scroll-padding: unset; scroll-padding-inline: unset; scroll-snap-align: unset; scroll-snap-stop: unset; scroll-snap-type: unset; scroll-target-group: unset; scroll-timeline: unset; scrollbar-color: unset; scrollbar-gutter: unset; scrollbar-width: unset; shape-image-threshold: unset; shape-margin: unset; shape-outside: unset; shape-rendering: unset; size: unset; speak: unset; stop-color: unset; stop-opacity: unset; stroke: unset; stroke-dasharray: unset; stroke-dashoffset: unset; stroke-linecap: unset; stroke-linejoin: unset; stroke-miterlimit: unset; stroke-opacity: unset; stroke-width: unset; tab-size: unset; table-layout: unset; text-align: unset; text-align-last: unset; text-anchor: unset; text-autospace: unset; text-box: unset; text-combine-upright: unset; text-decoration: unset; text-decoration-skip-ink: unset; text-emphasis: unset; text-emphasis-position: unset; text-indent: unset; text-justify: unset; text-overflow: unset; text-shadow: unset; text-transform: unset; text-underline-offset: unset; text-underline-position: unset; text-wrap: unset; timeline-scope: unset; timeline-trigger: unset; top: 0px; touch-action: unset; transform: unset; transform-box: unset; transform-origin: unset; transform-style: unset; transition: unset; translate: unset; trigger-scope: unset; user-select: unset; vector-effect: unset; vertical-align: unset; view-timeline: unset; view-transition-class: unset; view-transition-group: unset; view-transition-name: unset; visibility: unset; border-spacing: unset; -webkit-box-align: unset; -webkit-box-decoration-break: unset; -webkit-box-direction: unset; -webkit-box-flex: unset; -webkit-box-ordinal-group: unset; -webkit-box-orient: unset; -webkit-box-pack: unset; -webkit-box-reflect: unset; -webkit-line-break: unset; -webkit-line-clamp: unset; -webkit-mask-box-image: unset; -webkit-rtl-ordering: unset; -webkit-ruby-position: unset; -webkit-tap-highlight-color: unset; -webkit-text-combine: unset; -webkit-text-decorations-in-effect: unset; -webkit-text-fill-color: unset; -webkit-text-security: unset; -webkit-text-stroke: unset; -webkit-user-drag: unset; white-space-collapse: unset; widows: unset; width: unset; will-change: unset; word-break: unset; word-spacing: unset; x: unset; y: unset; z-index: unset;"><template shadowrootmode="closed"><link rel="stylesheet" href="chrome-extension://gbefmodhlophhakmoecijeppjblibmie/contentscript.css"></template></div></div></body></html>
