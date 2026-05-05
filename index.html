@@ -701,6 +701,12 @@
         }
         .modal-overlay.viewing-doc .modal > *:not(.doc-viewer) { display: none; }
 
+        /* Clickable mermaid subgraph clusters (open step modal on click) */
+        .mermaid .cluster { transition: filter 0.15s ease; }
+        .mermaid .cluster:hover { filter: brightness(1.25); }
+        .mermaid .cluster:hover .cluster-label-bkg,
+        .mermaid .cluster:hover rect { stroke-width: 2.5px !important; }
+
         .doc-viewer {
             display: none;
             flex-direction: column;
@@ -1707,7 +1713,7 @@ flowchart LR
                     <li>Docs Manager drafts SRS, wireframes, mockups</li>
                     <li>Figma / GG Stitch / Claude Design refines product design</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="1">
                 <div class="card-header">
@@ -1721,7 +1727,7 @@ flowchart LR
                     <li>👤 <b>Human Gate</b> — review plan, validate scope &amp; tradeoffs</li>
                     <li>Approve hoặc reject (loop back để revise)</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="2">
                 <div class="card-header">
@@ -1736,7 +1742,7 @@ flowchart LR
                     <li>🔵 <b>REFACTOR</b> — clean code khi vẫn giữ xanh</li>
                     <li>⛔ <i>NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST</i></li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="3">
                 <div class="card-header">
@@ -1748,7 +1754,7 @@ flowchart LR
                     <li>Detects edge cases, performance issues</li>
                     <li>Issues found → back to TDD loop</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="4">
                 <div class="card-header">
@@ -1761,7 +1767,7 @@ flowchart LR
                     <li>Sign-off checklist gate trước khi deploy</li>
                     <li>Reject → loop back tới phase liên quan để revise</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="5">
                 <div class="card-header">
@@ -1773,7 +1779,7 @@ flowchart LR
                     <li>Creates PR with summary &amp; test plan</li>
                     <li>Deploy &amp; sync documentation updates</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
         </div>
 
@@ -1789,7 +1795,7 @@ flowchart LR
                     <li>Gap Analyzer compare as-is vs to-be → impact map</li>
                     <li>Output bộ docs chuẩn (SRS · wireframe · architecture) — đồng bộ format greenfield</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="1" data-pipeline="brownfield">
                 <div class="card-header">
@@ -1802,7 +1808,7 @@ flowchart LR
                     <li>👤 <b>Human Gate</b> — Tech Lead + PM + <b>Customer SME</b> approve plan</li>
                     <li>Reject → loop back để revise</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="2" data-pipeline="brownfield">
                 <div class="card-header">
@@ -1817,7 +1823,7 @@ flowchart LR
                     <li>🔵 <b>REFACTOR</b> — clean code khi vẫn giữ xanh</li>
                     <li>⛔ <i>NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST</i></li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="3" data-pipeline="brownfield">
                 <div class="card-header">
@@ -1829,7 +1835,7 @@ flowchart LR
                     <li>Detects edge cases, performance issues</li>
                     <li>Issues found → back to TDD loop</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="4" data-pipeline="brownfield">
                 <div class="card-header">
@@ -1842,7 +1848,7 @@ flowchart LR
                     <li>Sign-off checklist gate trước khi deploy</li>
                     <li>Reject → loop back tới phase liên quan để revise</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
             <div class="detail-card" data-step="5" data-pipeline="brownfield">
                 <div class="card-header">
@@ -1854,7 +1860,7 @@ flowchart LR
                     <li>Creates PR with summary &amp; test plan</li>
                     <li>Deploy &amp; sync documentation updates</li>
                 </ul>
-                <div class="card-cta">View outputs →</div>
+                <div class="card-cta">View Detail →</div>
             </div>
         </div>
 
@@ -1941,12 +1947,36 @@ flowchart LR
             }
         });
 
+        // Bind click on flowchart subgraphs (STEP n) to open the corresponding step modal.
+        // Mermaid renders subgraphs as <g class="cluster"> — we match by label text "STEP <n>".
+        function bindFlowchartClicks(container, pipeline) {
+            if (!container) return;
+            container.querySelectorAll('.cluster').forEach(cluster => {
+                const text = (cluster.textContent || '').toUpperCase();
+                const m = text.match(/STEP\s+(\d+)/);
+                if (!m) return;
+                const stepKey = String(parseInt(m[1], 10));
+                cluster.style.cursor = 'pointer';
+                cluster.addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (typeof openModal === 'function') openModal(stepKey, pipeline);
+                });
+            });
+        }
+
+        async function runMermaidAndBind(node, pipeline) {
+            if (!node || !window.mermaid) return;
+            try {
+                await mermaid.run({ nodes: [node] });
+                node.dataset.processed = '1';
+                bindFlowchartClicks(node, pipeline);
+            } catch (e) { console.error(e); }
+        }
+
         // Render only the active pipeline at startup; brownfield is rendered lazily on tab switch.
         document.addEventListener('DOMContentLoaded', () => {
             const initial = document.querySelector('.mermaid.pipeline-greenfield');
-            if (initial && window.mermaid) {
-                try { mermaid.run({ nodes: [initial] }); initial.dataset.processed = '1'; } catch (e) { console.error(e); }
-            }
+            runMermaidAndBind(initial, 'greenfield');
         });
     </script>
 
@@ -2605,7 +2635,7 @@ flowchart LR
             if (window.mermaid) {
                 const activeMermaid = document.querySelector(`.mermaid.pipeline-${name}`);
                 if (activeMermaid && !activeMermaid.dataset.processed) {
-                    try { mermaid.run({ nodes: [activeMermaid] }); activeMermaid.dataset.processed = '1'; } catch (e) {}
+                    runMermaidAndBind(activeMermaid, name);
                 }
             }
         }
