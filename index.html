@@ -683,11 +683,23 @@
         /* Doc viewer */
         /* ---- Doc Viewer (reader-friendly) ---- */
 
-        /* Modal expands wider when viewing doc */
-        .modal-overlay.viewing-doc .modal {
-            max-width: 1280px;
-            max-height: 92vh;
+        /* When viewing doc: collapse modal so its transform/overflow does not constrain the fixed-position viewer */
+        .modal-overlay.viewing-doc {
+            background: transparent;
+            pointer-events: none;
         }
+        .modal-overlay.viewing-doc .modal {
+            transform: none;
+            max-width: none;
+            max-height: none;
+            width: 0;
+            height: 0;
+            overflow: visible;
+            border: 0;
+            box-shadow: none;
+            background: transparent;
+        }
+        .modal-overlay.viewing-doc .modal > *:not(.doc-viewer) { display: none; }
 
         .doc-viewer {
             display: none;
@@ -698,7 +710,7 @@
             border-radius: 0;
             z-index: 9999;
         }
-        .doc-viewer.active { display: flex; }
+        .doc-viewer.active { display: flex; pointer-events: auto; }
         body.doc-viewer-open { overflow: hidden; }
 
         /* Reading progress bar */
